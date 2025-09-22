@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>15 Temmuz Gazetesi</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/blasten/turn.js/turn.min.js"></script>
+  <style>
+    body {
+      background: #ccc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    #flipbook {
+      margin-bottom: 20px;
+      background: white;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    }
+
+    #flipbook .page {
+      background: white;
+      border: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      box-shadow: none !important;
+    }
+
+    #flipbook .page img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .controls {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .controls button {
+      padding: 12px 28px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      background: #2c7be5;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+
+    .controls button:hover {
+      background: #1a5dc9;
+      transform: scale(1.05);
+    }
+
+    .controls button:active {
+      transform: scale(0.95);
+    }
+  </style>
+</head>
+<body>
+  <div id="flipbook">
+    <!-- 20 sayfa -->
+    <div class="page"><img src="pages/1.jpg" alt="Page 1"></div>
+    <div class="page"><img src="pages/2.jpg" alt="Page 2"></div>
+    <div class="page"><img src="pages/3.jpg" alt="Page 3"></div>
+    <div class="page"><img src="pages/4.jpg" alt="Page 4"></div>
+    <div class="page"><img src="pages/5.jpg" alt="Page 5"></div>
+    <div class="page"><img src="pages/6.jpg" alt="Page 6"></div>
+    <div class="page"><img src="pages/7.jpg" alt="Page 7"></div>
+    <div class="page"><img src="pages/8.jpg" alt="Page 8"></div>
+    <div class="page"><img src="pages/9.jpg" alt="Page 9"></div>
+    <div class="page"><img src="pages/10.jpg" alt="Page 10"></div>
+    <div class="page"><img src="pages/11.jpg" alt="Page 11"></div>
+    <div class="page"><img src="pages/12.jpg" alt="Page 12"></div>
+    <div class="page"><img src="pages/13.jpg" alt="Page 13"></div>
+    <div class="page"><img src="pages/14.jpg" alt="Page 14"></div>
+    <div class="page"><img src="pages/15.jpg" alt="Page 15"></div>
+    <div class="page"><img src="pages/16.jpg" alt="Page 16"></div>
+    <div class="page"><img src="pages/17.jpg" alt="Page 17"></div>
+    <div class="page"><img src="pages/18.jpg" alt="Page 18"></div>
+    <div class="page"><img src="pages/19.jpg" alt="Page 19"></div>
+    <div class="page"><img src="pages/20.jpg" alt="Page 20"></div>
+  </div>
+
+  <div class="controls">
+    <button id="prev">⬅ Önceki</button>
+    <button id="next">Sonraki ➡</button>
+  </div>
+
+  <script>
+    function resizeFlipbook() {
+      // tek sayfa max 500px
+      let pageWidth = Math.min(window.innerWidth * 0.45, 500);
+      let bookWidth = pageWidth * 2;
+      let bookHeight = window.innerHeight * 0.85;
+
+      $("#flipbook").turn("size", bookWidth, bookHeight);
+    }
+
+    $(function(){
+      $("#flipbook").turn({
+        width: 1000, // 2 x 500 px
+        height: window.innerHeight * 0.85,
+        display: 'double',
+        autoCenter: false,   // 🔑 ortalamayı kapattık
+        elevation: 0,
+        gradients: false
+      });
+
+      $("#prev").click(function(){
+        $("#flipbook").turn("previous");
+      });
+
+      $("#next").click(function(){
+        $("#flipbook").turn("next");
+      });
+
+      $(window).resize(function(){
+        resizeFlipbook();
+      });
+
+      resizeFlipbook();
+    });
+  </script>
+</body>
+</html>
