@@ -123,5 +123,38 @@
       document.body.appendChild(script);
 
     </script>
+
+    <script>
+function Unity_RegisterOrientationCallback(gameObject, methodName) {
+  function debounce(fn, d){ let t; return ()=>{ clearTimeout(t); t=setTimeout(fn, d);} }
+  function isLandscapeNow(){
+    try{
+      if (screen.orientation && screen.orientation.type) return screen.orientation.type.startsWith('landscape');
+      if (window.matchMedia) return window.matchMedia('(orientation: landscape)').matches;
+      return window.innerWidth > window.innerHeight;
+    }catch(e){ return window.innerWidth > window.innerHeight; }
+  }
+  const notify = debounce(()=>{ try{ SendMessage(gameObject, methodName, isLandscapeNow()?1:0);}catch(e){} }, 80);
+
+  // SendMessage hazır olmadan çağırmayı denememek için küçük bekleme
+  (function waitSM(){
+    if (typeof SendMessage === "function") { setTimeout(notify, 0); }
+    else { setTimeout(waitSM, 30); }
+  })();
+
+  if (screen.orientation && screen.orientation.addEventListener) screen.orientation.addEventListener('change', notify);
+  window.addEventListener('orientationchange', notify);
+  window.addEventListener('resize', notify);
+  window.addEventListener('pageshow', notify);
+}
+function Unity_GetIsLandscapeNow(){
+  try{
+    if (screen.orientation && screen.orientation.type) return screen.orientation.type.startsWith('landscape')?1:0;
+    if (window.matchMedia) return window.matchMedia('(orientation: landscape)').matches?1:0;
+    return window.innerWidth > window.innerHeight ? 1 : 0;
+  }catch(e){ return window.innerWidth > window.innerHeight ? 1 : 0; }
+}
+</script>
+
   </body>
 </html>
