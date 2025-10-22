@@ -55,9 +55,9 @@
       var loaderUrl = buildUrl + "/OGM_Algoritma.loader.js";
       var config = {
         arguments: [],
-        dataUrl: buildUrl + "/OGM_Algoritma.data.gz",
-        frameworkUrl: buildUrl + "/OGM_Algoritma.framework.js.gz",
-        codeUrl: buildUrl + "/OGM_Algoritma.wasm.gz",
+        dataUrl: buildUrl + "/OGM_Algoritma.data",
+        frameworkUrl: buildUrl + "/OGM_Algoritma.framework.js",
+        codeUrl: buildUrl + "/OGM_Algoritma.wasm",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "OGM",
         productName: "OGM_Algoritma",
@@ -125,34 +125,67 @@
     </script>
 
     <script>
+/* ===== Unity WebGL Orientation Bridge (no .jslib) ===== */
 function Unity_RegisterOrientationCallback(gameObject, methodName) {
-  function debounce(fn, d){ let t; return ()=>{ clearTimeout(t); t=setTimeout(fn, d);} }
-  function isLandscapeNow(){
-    try{
-      if (screen.orientation && screen.orientation.type) return screen.orientation.type.startsWith('landscape');
-      if (window.matchMedia) return window.matchMedia('(orientation: landscape)').matches;
-      return window.innerWidth > window.innerHeight;
-    }catch(e){ return window.innerWidth > window.innerHeight; }
+  // iOS/resize spam için basit debounce
+  function debounce(fn, delay) {
+    let t;
+    return function () {
+      clearTimeout(t);
+      t = setTimeout(fn, delay);
+    };
   }
-  const notify = debounce(()=>{ try{ SendMessage(gameObject, methodName, isLandscapeNow()?1:0);}catch(e){} }, 80);
 
-  // SendMessage hazır olmadan çağırmayı denememek için küçük bekleme
-  (function waitSM(){
-    if (typeof SendMessage === "function") { setTimeout(notify, 0); }
-    else { setTimeout(waitSM, 30); }
+  // Cihaz yatay mı?
+  function isLandscapeNow() {
+    try {
+      if (screen.orientation && screen.orientation.type)
+        return screen.orientation.type.startsWith('landscape');
+      if (window.matchMedia)
+        return window.matchMedia('(orientation: landscape)').matches;
+      return window.innerWidth > window.innerHeight;
+    } catch (e) {
+      return window.innerWidth > window.innerHeight;
+    }
+  }
+
+  // Unity'ye durum bildir
+  const notify = debounce(function () {
+    try {
+      SendMessage(gameObject, methodName, isLandscapeNow() ? 1 : 0);
+    } catch (e) {
+      /* SendMessage hazır değilse bekleyeceğiz */
+    }
+  }, 80);
+
+  // SendMessage hazır olana kadar bekle (ilk çağrı garantisi)
+  (function waitSendMessageReady() {
+    if (typeof SendMessage === "function") {
+      setTimeout(notify, 0);
+    } else {
+      setTimeout(waitSendMessageReady, 30);
+    }
   })();
 
-  if (screen.orientation && screen.orientation.addEventListener) screen.orientation.addEventListener('change', notify);
+  // Olay dinleyicileri (yedekli)
+  if (screen.orientation && screen.orientation.addEventListener)
+    screen.orientation.addEventListener('change', notify);
   window.addEventListener('orientationchange', notify);
   window.addEventListener('resize', notify);
-  window.addEventListener('pageshow', notify);
+  window.addEventListener('pageshow', notify); // iOS geri dönüş
 }
-function Unity_GetIsLandscapeNow(){
-  try{
-    if (screen.orientation && screen.orientation.type) return screen.orientation.type.startsWith('landscape')?1:0;
-    if (window.matchMedia) return window.matchMedia('(orientation: landscape)').matches?1:0;
+
+// C# tarafında ilk durumu çekmek için
+function Unity_GetIsLandscapeNow() {
+  try {
+    if (screen.orientation && screen.orientation.type)
+      return screen.orientation.type.startsWith('landscape') ? 1 : 0;
+    if (window.matchMedia)
+      return window.matchMedia('(orientation: landscape)').matches ? 1 : 0;
     return window.innerWidth > window.innerHeight ? 1 : 0;
-  }catch(e){ return window.innerWidth > window.innerHeight ? 1 : 0; }
+  } catch (e) {
+    return window.innerWidth > window.innerHeight ? 1 : 0;
+  }
 }
 </script>
 
