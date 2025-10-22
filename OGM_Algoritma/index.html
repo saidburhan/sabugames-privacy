@@ -110,7 +110,6 @@
         createUnityInstance(canvas, config, (progress) => {
           document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
               }).then((unityInstance) => {
-                window.SendMessage = unityInstance.SendMessage.bind(unityInstance);
                 document.querySelector("#unity-loading-bar").style.display = "none";
                 document.querySelector("#unity-fullscreen-button").onclick = () => {
                   unityInstance.SetFullscreen(1);
@@ -124,96 +123,70 @@
       document.body.appendChild(script);
 
     </script>
+    <script>
+/* Unity WebGL Orientation Bridge (no .jslib, no eval) */
+(function () {
+  var targetObject = "OrientationBridge";
+  var targetMethod = "OnOrientationChanged";
 
- <script>
-/* ===== Unity WebGL Orientation Bridge (debug-enabled, supports unityInstance.SendMessage) ===== */
-function Unity_RegisterOrientationCallback(gameObject, methodName) {
-  // Resolve the correct SendMessage function (global or unityInstance)
   function getSendMessageFn() {
     if (typeof window.SendMessage === "function") return window.SendMessage;
-    if (typeof window.unityInstance !== "undefined" && window.unityInstance && typeof window.unityInstance.SendMessage === "function") {
+    if (typeof window.unityInstance !== "undefined" &&
+        window.unityInstance &&
+        typeof window.unityInstance.SendMessage === "function") {
       return window.unityInstance.SendMessage.bind(window.unityInstance);
     }
     return null;
   }
 
-  // Simple debounce to avoid rapid event spam (esp. on iOS Safari)
   function debounce(fn, delay) {
-    let t;
+    var t;
     return function () {
       clearTimeout(t);
       t = setTimeout(fn, delay);
     };
   }
 
-  // Determine if the current orientation is landscape
   function isLandscapeNow() {
     try {
       if (screen.orientation && screen.orientation.type)
-        return screen.orientation.type.startsWith('landscape');
+        return screen.orientation.type.startsWith("landscape");
       if (window.matchMedia)
-        return window.matchMedia('(orientation: landscape)').matches;
-      // Fallback for older browsers/iOS
+        return window.matchMedia("(orientation: landscape)").matches;
       return window.innerWidth > window.innerHeight;
     } catch (e) {
       return window.innerWidth > window.innerHeight;
     }
   }
 
-  // Notify Unity via SendMessage (with debug logs)
-  const notify = debounce(function () {
-    const val = isLandscapeNow() ? 1 : 0;
-    console.log("[ORIENTATION] notify ->", val);
-    const SM = getSendMessageFn();
-    if (!SM) {
-      console.warn("[ORIENTATION] SendMessage not ready yet");
-      return;
-    }
-    try {
-      SM(gameObject, methodName, val);
-    } catch (e) {
-      console.warn("[ORIENTATION] SendMessage call failed:", e);
-    }
+  var notify = debounce(function () {
+    var SM = getSendMessageFn();
+    if (!SM) return;
+    var val = isLandscapeNow() ? 1 : 0;
+    try { SM(targetObject, targetMethod, val); } catch (_) {}
   }, 80);
 
-  // Ensure SendMessage exists before first call
-  (function waitSendMessageReady() {
-    const SM = getSendMessageFn();
-    if (SM) {
-      console.log("[ORIENTATION] SendMessage ready");
-      setTimeout(notify, 100); // initial state
+  // Wait until SendMessage is available, then send initial state
+  (function waitForSendMessage() {
+    if (getSendMessageFn()) {
+      setTimeout(notify, 100);
     } else {
-      setTimeout(waitSendMessageReady, 100);
+      setTimeout(waitForSendMessage, 100);
     }
   })();
 
-  // Event listeners (redundant set for robustness; iOS often needs delays)
+  // Robust set of listeners (covers iOS/Android/desktop)
   if (screen.orientation && screen.orientation.addEventListener)
-    screen.orientation.addEventListener('change', notify);
+    screen.orientation.addEventListener("change", notify);
 
-  window.addEventListener('orientationchange', function () {
-    // iOS may emit orientationchange before layout settles
-    setTimeout(notify, 300);
+  window.addEventListener("orientationchange", function () {
+    setTimeout(notify, 300); // layout settle on iOS
   });
 
-  window.addEventListener('resize', notify);
-  window.addEventListener('pageshow', notify); // fired when returning to the page
-}
-
-// Optional: C# can query initial state synchronously if needed
-function Unity_GetIsLandscapeNow() {
-  try {
-    if (screen.orientation && screen.orientation.type)
-      return screen.orientation.type.startsWith('landscape') ? 1 : 0;
-    if (window.matchMedia)
-      return window.matchMedia('(orientation: landscape)').matches ? 1 : 0;
-    return window.innerWidth > window.innerHeight ? 1 : 0;
-  } catch (e) {
-    return window.innerWidth > window.innerHeight ? 1 : 0;
-  }
-}
+  window.addEventListener("resize", notify);
+  window.addEventListener("pageshow", notify);
+})();
 </script>
-
 
   </body>
 </html>
