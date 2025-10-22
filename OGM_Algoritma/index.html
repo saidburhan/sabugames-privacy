@@ -124,10 +124,10 @@
 
     </script>
 
-    <script>
-/* ===== Unity WebGL Orientation Bridge (no .jslib) ===== */
+   <script>
+/* ===== Unity WebGL Orientation Bridge (debug-enabled, no .jslib) ===== */
 function Unity_RegisterOrientationCallback(gameObject, methodName) {
-  // iOS/resize spam için basit debounce
+  // Simple debounce to avoid rapid event spam (esp. on iOS Safari)
   function debounce(fn, delay) {
     let t;
     return function () {
@@ -136,46 +136,55 @@ function Unity_RegisterOrientationCallback(gameObject, methodName) {
     };
   }
 
-  // Cihaz yatay mı?
+  // Determine if the current orientation is landscape
   function isLandscapeNow() {
     try {
       if (screen.orientation && screen.orientation.type)
         return screen.orientation.type.startsWith('landscape');
       if (window.matchMedia)
         return window.matchMedia('(orientation: landscape)').matches;
+      // Fallback for older browsers/iOS
       return window.innerWidth > window.innerHeight;
     } catch (e) {
       return window.innerWidth > window.innerHeight;
     }
   }
 
-  // Unity'ye durum bildir
+  // Notify Unity via SendMessage (with debug logs)
   const notify = debounce(function () {
+    const val = isLandscapeNow() ? 1 : 0;
+    console.log("[ORIENTATION] notify ->", val);
     try {
-      SendMessage(gameObject, methodName, isLandscapeNow() ? 1 : 0);
+      SendMessage(gameObject, methodName, val);
     } catch (e) {
-      /* SendMessage hazır değilse bekleyeceğiz */
+      console.warn("[ORIENTATION] SendMessage not ready:", e);
     }
   }, 80);
 
-  // SendMessage hazır olana kadar bekle (ilk çağrı garantisi)
+  // Ensure SendMessage exists before first call
   (function waitSendMessageReady() {
     if (typeof SendMessage === "function") {
-      setTimeout(notify, 0);
+      console.log("[ORIENTATION] SendMessage ready");
+      setTimeout(notify, 100); // initial state
     } else {
-      setTimeout(waitSendMessageReady, 30);
+      setTimeout(waitSendMessageReady, 100);
     }
   })();
 
-  // Olay dinleyicileri (yedekli)
+  // Event listeners (redundant set for robustness; iOS often needs delays)
   if (screen.orientation && screen.orientation.addEventListener)
     screen.orientation.addEventListener('change', notify);
-  window.addEventListener('orientationchange', notify);
+
+  window.addEventListener('orientationchange', function () {
+    // iOS may emit orientationchange before layout settles
+    setTimeout(notify, 300);
+  });
+
   window.addEventListener('resize', notify);
-  window.addEventListener('pageshow', notify); // iOS geri dönüş
+  window.addEventListener('pageshow', notify); // fired when returning to the page
 }
 
-// C# tarafında ilk durumu çekmek için
+// Optional: C# can query initial state synchronously if needed
 function Unity_GetIsLandscapeNow() {
   try {
     if (screen.orientation && screen.orientation.type)
