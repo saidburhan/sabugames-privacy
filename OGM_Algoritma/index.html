@@ -110,6 +110,7 @@
         createUnityInstance(canvas, config, (progress) => {
           document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
               }).then((unityInstance) => {
+                window.SendMessage = unityInstance.SendMessage.bind(unityInstance);
                 document.querySelector("#unity-loading-bar").style.display = "none";
                 document.querySelector("#unity-fullscreen-button").onclick = () => {
                   unityInstance.SetFullscreen(1);
@@ -124,9 +125,18 @@
 
     </script>
 
-   <script>
-/* ===== Unity WebGL Orientation Bridge (debug-enabled, no .jslib) ===== */
+ <script>
+/* ===== Unity WebGL Orientation Bridge (debug-enabled, supports unityInstance.SendMessage) ===== */
 function Unity_RegisterOrientationCallback(gameObject, methodName) {
+  // Resolve the correct SendMessage function (global or unityInstance)
+  function getSendMessageFn() {
+    if (typeof window.SendMessage === "function") return window.SendMessage;
+    if (typeof window.unityInstance !== "undefined" && window.unityInstance && typeof window.unityInstance.SendMessage === "function") {
+      return window.unityInstance.SendMessage.bind(window.unityInstance);
+    }
+    return null;
+  }
+
   // Simple debounce to avoid rapid event spam (esp. on iOS Safari)
   function debounce(fn, delay) {
     let t;
@@ -154,16 +164,22 @@ function Unity_RegisterOrientationCallback(gameObject, methodName) {
   const notify = debounce(function () {
     const val = isLandscapeNow() ? 1 : 0;
     console.log("[ORIENTATION] notify ->", val);
+    const SM = getSendMessageFn();
+    if (!SM) {
+      console.warn("[ORIENTATION] SendMessage not ready yet");
+      return;
+    }
     try {
-      SendMessage(gameObject, methodName, val);
+      SM(gameObject, methodName, val);
     } catch (e) {
-      console.warn("[ORIENTATION] SendMessage not ready:", e);
+      console.warn("[ORIENTATION] SendMessage call failed:", e);
     }
   }, 80);
 
   // Ensure SendMessage exists before first call
   (function waitSendMessageReady() {
-    if (typeof SendMessage === "function") {
+    const SM = getSendMessageFn();
+    if (SM) {
       console.log("[ORIENTATION] SendMessage ready");
       setTimeout(notify, 100); // initial state
     } else {
@@ -197,6 +213,7 @@ function Unity_GetIsLandscapeNow() {
   }
 }
 </script>
+
 
   </body>
 </html>
