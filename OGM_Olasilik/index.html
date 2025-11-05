@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Unity Web Player | OGM_Algoritma</title>
+    <title>Unity Web Player | OGM_Projects</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
   </head>
@@ -20,7 +20,7 @@
       <div id="unity-footer">
         <div id="unity-logo-title-footer"></div>
         <div id="unity-fullscreen-button"></div>
-        <div id="unity-build-title">OGM_Algoritma</div>
+        <div id="unity-build-title">OGM_Projects</div>
       </div>
     </div>
     <script>
@@ -59,8 +59,8 @@
         frameworkUrl: buildUrl + "/OGM_Olasilik.framework.js",
         codeUrl: buildUrl + "/OGM_Olasilik.wasm",
         streamingAssetsUrl: "StreamingAssets",
-        companyName: "OGM",
-        productName: "OGM_Algoritma",
+        companyName: "isiksaitburhan",
+        productName: "OGM_Projects",
         productVersion: "1.0",
         showBanner: unityShowBanner,
       };
@@ -110,6 +110,8 @@
         createUnityInstance(canvas, config, (progress) => {
           document.querySelector("#unity-progress-bar-full").style.width = 100 * progress + "%";
               }).then((unityInstance) => {
+                 window.unityInstance = unityInstance; // EKLE
+                 window.SendMessage = unityInstance.SendMessage.bind(unityInstance); // EKLE
                 document.querySelector("#unity-loading-bar").style.display = "none";
                 document.querySelector("#unity-fullscreen-button").onclick = () => {
                   unityInstance.SetFullscreen(1);
@@ -123,5 +125,70 @@
       document.body.appendChild(script);
 
     </script>
+
+     <script>
+/* Unity WebGL Orientation Bridge (no .jslib, no eval) */
+(function () {
+  var targetObject = "OrientationBridge";
+  var targetMethod = "OnOrientationChanged";
+
+  function getSendMessageFn() {
+    if (typeof window.SendMessage === "function") return window.SendMessage;
+    if (typeof window.unityInstance !== "undefined" &&
+        window.unityInstance &&
+        typeof window.unityInstance.SendMessage === "function") {
+      return window.unityInstance.SendMessage.bind(window.unityInstance);
+    }
+    return null;
+  }
+
+  function debounce(fn, delay) {
+    var t;
+    return function () {
+      clearTimeout(t);
+      t = setTimeout(fn, delay);
+    };
+  }
+
+  function isLandscapeNow() {
+    try {
+      if (screen.orientation && screen.orientation.type)
+        return screen.orientation.type.startsWith("landscape");
+      if (window.matchMedia)
+        return window.matchMedia("(orientation: landscape)").matches;
+      return window.innerWidth > window.innerHeight;
+    } catch (e) {
+      return window.innerWidth > window.innerHeight;
+    }
+  }
+
+  var notify = debounce(function () {
+    var SM = getSendMessageFn();
+    if (!SM) return;
+    var val = isLandscapeNow() ? 1 : 0;
+    try { SM(targetObject, targetMethod, val); } catch (_) {}
+  }, 80);
+
+  // Wait until SendMessage is available, then send initial state
+  (function waitForSendMessage() {
+    if (getSendMessageFn()) {
+      setTimeout(notify, 100);
+    } else {
+      setTimeout(waitForSendMessage, 100);
+    }
+  })();
+
+  // Robust set of listeners (covers iOS/Android/desktop)
+  if (screen.orientation && screen.orientation.addEventListener)
+    screen.orientation.addEventListener("change", notify);
+
+  window.addEventListener("orientationchange", function () {
+    setTimeout(notify, 300); // layout settle on iOS
+  });
+
+  window.addEventListener("resize", notify);
+  window.addEventListener("pageshow", notify);
+})();
+</script>
   </body>
 </html>
