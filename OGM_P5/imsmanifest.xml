@@ -1,41 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<manifest identifier="MANIFEST-UnityWebGL" version="1.0"
-          xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2"
-          xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://www.imsproject.org/xsd/imscp_rootv1p1p2
-          ims_xml.xsd
-          http://www.adlnet.org/xsd/adlcp_rootv1p2
-          adlcp_rootv1p2.xsd">
+<manifest identifier="MANIFEST-UNITY-WEBGL-EBA" version="1.2"
+  xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2"
+  xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="
+    http://www.imsproject.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd
+    http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd">
 
-  <metadata>
-    <schema>ADL SCORM</schema>
-    <schemaversion>1.2</schemaversion>
-  </metadata>
-
-  <organizations default="ORG-UnityWebGL">
-    <organization identifier="ORG-UnityWebGL">
-      <title>Unity WebGL Eğitim İçeriği</title>
-      <item identifier="ITEM-UnityWebGL" identifierref="RES-UnityWebGL">
-        <title>Unity WebGL Eğitim</title>
+  <organizations default="ORG-1">
+    <organization identifier="ORG-1">
+      <title>Unity WebGL EBA İçerik</title>
+      <item identifier="ITEM-1" identifierref="RES-1" isvisible="true">
+        <title>Başlat</title>
       </item>
     </organization>
   </organizations>
 
   <resources>
-    <resource identifier="RES-UnityWebGL" type="webcontent"
-              adlcp:scormtype="sco" href="index.html">
-      <!-- WebGL buildindeki tüm dosyaları dahil et -->
+    <resource identifier="RES-1" type="webcontent" adlcp:scormtype="sco" href="index.html">
       <file href="index.html"/>
-      <file href="Build/UnityLoader.js"/>
-      <file href="Build/Build.data"/>
-      <file href="Build/Build.framework.js"/>
-      <file href="Build/Build.wasm"/>
-      <file href="TemplateData/style.css"/>
-      <file href="TemplateData/fullscreen.png"/>
-      <file href="TemplateData/progressLogo.png"/>
-      <file href="TemplateData/progressBarEmpty.png"/>
-      <file href="TemplateData/progressBarFull.png"/>
+      <file href="eba_lms_bridge.js"/>
+
+      <!-- AŞAĞIDAKİ 4 SATIRI Unity build dosya adlarınla BİREBİR değiştir -->
+      <file href="Build/OGM_P5.loader.js"/>
+      <file href="Build/OGM_P5.data"/>
+      <file href="Build/OGM_P5.framework.js"/>
+      <file href="Build/OGM_P5.wasm"/>
     </resource>
   </resources>
 
