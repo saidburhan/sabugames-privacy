@@ -6,6 +6,12 @@
     <title>Eğim</title>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
+     <script src="eba_lms_bridge.js"></script>
+    <script>
+      window.addEventListener("load", () => {
+        if (window.EBA_LMS) EBA_LMS.init();
+      });
+    </script>
   </head>
   <body>
     <div id="unity-container" class="unity-desktop">
