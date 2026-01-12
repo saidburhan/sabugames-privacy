@@ -415,6 +415,49 @@ body {
     width: 100%;
 }
 
+.modal.help-modal {
+    text-align: left;
+    max-width: 500px;
+    position: relative;
+    border: 2px solid var(--grid-thick-line-color);
+}
+
+.close-icon-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--secondary-color);
+    cursor: pointer;
+}
+
+.help-content {
+    margin-top: 1rem;
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.help-content ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 1rem;
+}
+
+.help-content li {
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.help-content i {
+    color: var(--primary-color);
+    width: 20px;
+    text-align: center;
+}
+
 /* Responsiveness */
 @media (max-width: 600px) {
     .app-container {

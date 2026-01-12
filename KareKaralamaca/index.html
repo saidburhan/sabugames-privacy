@@ -23,9 +23,12 @@
                 <p>Satır ve sütun sayılarına göre kareleri doldur!</p>
             </div>
             <div class="header-controls">
-                <div id="level-indicator" class="level-badge">Level 1 / 10</div>
+                <div id="level-indicator" class="level-badge">Level 1 / 20</div>
                 <button id="theme-toggle" class="icon-btn" title="Tema Değiştir">
                     <i class="fas fa-moon"></i>
+                </button>
+                <button id="btn-help" class="icon-btn" title="Nasıl Oynanır?">
+                    <i class="fas fa-question-circle"></i>
                 </button>
             </div>
         </header>
@@ -42,15 +45,19 @@
                     <i class="fas fa-square"></i>
                     <span>Doldur</span>
                 </button>
-                <button class="tool-btn" id="tool-cross" data-mode="cross">
+                <button class="tool-btn" id="tool-empty" data-mode="empty">
                     <i class="fas fa-times"></i>
-                    <span>İşaretle</span>
+                    <span>Boş / Kilitle</span>
                 </button>
             </div>
 
             <div class="actions">
+                <button class="action-btn secondary" id="btn-restart-all"
+                    style="color: #ef4444; border: 1px solid #ef4444;">
+                    <i class="fas fa-power-off"></i> Baştan Başla
+                </button>
                 <button class="action-btn secondary" id="btn-reset">
-                    <i class="fas fa-redo"></i> Sıfırla
+                    <i class="fas fa-redo"></i> Temizle
                 </button>
                 <button class="action-btn primary" id="btn-check">
                     <i class="fas fa-check"></i> Kontrol Et
@@ -69,6 +76,25 @@
                     <button class="action-btn secondary" id="btn-close-modal">Kapat</button>
                     <button class="action-btn primary" id="btn-next-level">Sonraki Level <i
                             class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div id="help-modal-overlay" class="modal-overlay hidden">
+            <div class="modal help-modal">
+                <button class="close-icon-btn" id="btn-close-help"><i class="fas fa-times"></i></button>
+                <h2>Nasıl Oynanır?</h2>
+                <div class="help-content">
+                    <p><strong>Amaç:</strong> Satır ve sütunların başındaki sayılara göre kareleri boyayarak gizli resmi
+                        ortaya çıkar.</p>
+                    <ul>
+                        <li><i class="fas fa-arrows-alt-h"></i> Birden fazla sayı varsa (örn: 3 1), aralarında en az bir
+                            boşluk olmalıdır.</li>
+                        <li><i class="fas fa-mouse-pointer"></i> <strong>Tıkla:</strong> Sol tık boyama yapar, sağ tık
+                            ise boş kareleri işaretler (kilitler).</li>
+                        <li><i class="fas fa-times"></i> <strong>Boş/Kilitle:</strong> Emin olduğun boş kareleri
+                            işaretlemek için bu aracı da kullanabilirsin.</li>
+                    </ul>
                 </div>
             </div>
         </div>
