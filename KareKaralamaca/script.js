@@ -73,6 +73,9 @@ class NonogramGame {
         this.dragMode = null;
         this.currentTool = 'fill';
 
+        // Initialize Sound Manager
+        this.soundManager = new SoundManager();
+
         this.init();
     }
 
@@ -102,10 +105,11 @@ class NonogramGame {
     renderLayout() {
         this.container.innerHTML = ''; // Clear previous
 
+        // Use CSS variables for responsive grid
         this.container.style.display = 'grid';
-        this.container.style.gridTemplateColumns = `auto repeat(${this.colCount}, 40px)`;
-        this.container.style.gridTemplateRows = `auto repeat(${this.rowCount}, 40px)`;
-        // Gap removed in CSS
+        this.container.style.setProperty('--col-count', this.colCount);
+        this.container.style.setProperty('--row-count', this.rowCount);
+        // Rows are handled by content flow, but we can set it if needed for advanced styling
 
         // 1. Spacer
         const spacer = document.createElement('div');
@@ -231,6 +235,11 @@ class NonogramGame {
         if (this.grid[r][c] !== newVal) {
             this.grid[r][c] = newVal;
             this.updateCellVisual(r, c);
+
+            // Play Sound
+            if (newVal === 1) this.soundManager.playPop();
+            else if (newVal === 2) this.soundManager.playClick();
+            else if (newVal === 0) this.soundManager.playErase();
         }
     }
 
@@ -246,6 +255,7 @@ class NonogramGame {
         this.grid = this.grid.map(row => row.map(() => 0));
         const cells = this.container.querySelectorAll('.cell');
         cells.forEach(c => c.classList.remove('filled', 'crossed'));
+        this.soundManager.playErase(); // Sound for reset
     }
 
     validate() {
@@ -285,6 +295,59 @@ class NonogramGame {
     }
 }
 
+class SoundManager {
+    constructor() {
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        this.masterGain = this.ctx.createGain();
+        this.masterGain.gain.value = 0.3; // Volume control
+        this.masterGain.connect(this.ctx.destination);
+    }
+
+    playTone(freq, type, duration, startTime = 0) {
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime + startTime);
+
+        gain.gain.setValueAtTime(0.3, this.ctx.currentTime + startTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + startTime + duration);
+
+        osc.connect(gain);
+        gain.connect(this.masterGain);
+
+        osc.start(this.ctx.currentTime + startTime);
+        osc.stop(this.ctx.currentTime + startTime + duration);
+    }
+
+    playPop() {
+        // High pitched sine pop for filling
+        this.playTone(600, 'sine', 0.1);
+    }
+
+    playClick() {
+        // Wooden click for crossing
+        this.playTone(300, 'triangle', 0.05);
+    }
+
+    playErase() {
+        // Soft low erasing sound
+        this.playTone(150, 'sine', 0.1);
+    }
+
+    playWin() {
+        // A major arpeggio
+        const now = this.ctx.currentTime;
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C E G C
+        notes.forEach((freq, i) => {
+            this.playTone(freq, 'sine', 0.2, i * 0.1);
+        });
+        // Harmony
+        setTimeout(() => this.playTone(523.25, 'triangle', 0.4), 0);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const game = new NonogramGame('game-container');
 
@@ -316,6 +379,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-check').addEventListener('click', () => {
         if (game.validate()) {
             triggerConfetti();
+            game.soundManager.playWin(); // Play win sound
             modalOverlay.classList.remove('hidden');
 
             // Check if final level
