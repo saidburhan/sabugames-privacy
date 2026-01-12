@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kare Karalamaca</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+
+    <div class="app-container">
+        <header class="game-header">
+            <div class="header-content">
+                <h1>Kare Karalamaca</h1>
+                <p>Satır ve sütun sayılarına göre kareleri doldur!</p>
+            </div>
+            <div class="header-controls">
+                 <button id="theme-toggle" class="icon-btn" title="Tema Değiştir">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="game-board-area">
+            <div class="game-container" id="game-container">
+                <!-- Grid will be injected here via JS -->
+            </div>
+        </main>
+
+        <footer class="game-controls">
+            <div class="tools">
+                <button class="tool-btn active" id="tool-fill" data-mode="fill">
+                    <i class="fas fa-square"></i>
+                    <span>Doldur</span>
+                </button>
+                <button class="tool-btn" id="tool-cross" data-mode="cross">
+                    <i class="fas fa-times"></i>
+                    <span>İşaretle</span>
+                </button>
+            </div>
+
+            <div class="actions">
+                <button class="action-btn secondary" id="btn-reset">
+                    <i class="fas fa-redo"></i> Sıfırla
+                </button>
+                <button class="action-btn primary" id="btn-check">
+                    <i class="fas fa-check"></i> Kontrol Et
+                </button>
+            </div>
+        </footer>
+
+        <div id="modal-overlay" class="modal-overlay hidden">
+            <div class="modal">
+                <div class="modal-icon success">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <h2>Tebrikler!</h2>
+                <p>Bulmacayı başarıyla tamamladın.</p>
+                <button class="action-btn primary" id="btn-close-modal">Tamam</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

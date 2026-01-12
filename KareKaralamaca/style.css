@@ -1,0 +1,362 @@
+:root {
+    --bg-color: #f0f2f5;
+    --text-color: #1e293b;
+    --primary-color: #6366f1;
+    --primary-hover: #4f46e5;
+    --secondary-color: #94a3b8;
+    --accent-color: #ef4444;
+    /* For errors or crosses */
+    --success-color: #22c55e;
+
+    --grid-line-color: #cbd5e1;
+    --grid-thick-line-color: #64748b;
+    --cell-empty-bg: #ffffff;
+    --cell-filled-bg: #334155;
+    --cell-hover-bg: #e2e8f0;
+
+    --radius-lg: 16px;
+    --radius-md: 8px;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode {
+    --bg-color: #0f172a;
+    --text-color: #f1f5f9;
+    --primary-color: #818cf8;
+    --primary-hover: #6366f1;
+    --secondary-color: #475569;
+    --grid-line-color: #334155;
+    --grid-thick-line-color: #94a3b8;
+    --cell-empty-bg: #1e293b;
+    --cell-filled-bg: #f8fafc;
+    /* Inverted for high contrast */
+    --cell-hover-bg: #334155;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Outfit', sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 800px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+}
+
+/* Header */
+.game-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--cell-empty-bg);
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.header-content h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 0.25rem;
+}
+
+.header-content p {
+    font-size: 0.875rem;
+    color: var(--secondary-color);
+}
+
+.icon-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.icon-btn:hover {
+    background-color: var(--cell-hover-bg);
+}
+
+/* Game Board Area */
+.game-board-area {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    overflow-x: auto;
+    padding: 2rem;
+    background: var(--cell-empty-bg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.game-container {
+    display: grid;
+    gap: 0;
+    /* Remove gap for table effect */
+    border: 2px solid var(--grid-thick-line-color);
+    /* Outer Thick Border */
+    background-color: var(--grid-line-color);
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Clues */
+.clue-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #434343;
+    /* Darker text for readability */
+    padding: 4px;
+    background-color: #fee6c5;
+    /* Pastel orange from image */
+    border: 1px solid #dcbfa0;
+    /* Slightly darker orange border */
+}
+
+.clue-row {
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding-right: 0.75rem;
+    border-right: 2px solid var(--grid-thick-line-color);
+    /* Boundary between clue and board */
+}
+
+.clue-col {
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 0.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--grid-thick-line-color);
+    /* Boundary between clue and board */
+}
+
+/* Top-left spacer styling */
+.game-container>div:first-child {
+    background-color: #fff8ee;
+    border-right: 2px solid var(--grid-thick-line-color);
+    border-bottom: 2px solid var(--grid-thick-line-color);
+}
+
+.clue-cell span {
+    display: inline-block;
+}
+
+/* The actual board grid */
+.cell {
+    background-color: #ffffff;
+    cursor: pointer;
+    position: relative;
+    border: 1px solid var(--grid-line-color);
+    transition: background-color 0.05s;
+    width: 40px;
+    height: 40px;
+}
+
+/* Cells on the far right / bottom borders fix (optional: usually grid handles this, but we want internal borders) */
+
+.cell:hover {
+    background-color: #f1f5f9;
+}
+
+.cell.filled {
+    background-color: #64748b;
+    /* Dark grey filled */
+    border-color: #475569;
+}
+
+/* Cross styling (X) */
+.cell.crossed::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 60%;
+    height: 60%;
+    background-image:
+        linear-gradient(45deg, transparent 45%, var(--accent-color) 45%, var(--accent-color) 55%, transparent 55%),
+        linear-gradient(-45deg, transparent 45%, var(--accent-color) 45%, var(--accent-color) 55%, transparent 55%);
+    transform: translate(-50%, -50%);
+    opacity: 0.8;
+}
+
+/* Footer Controls */
+.game-controls {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    background: var(--cell-empty-bg);
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.tools {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.tool-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    border: 1px solid var(--grid-line-color);
+    background: transparent;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.tool-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-btn {
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--radius-md);
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: transform 0.1s;
+}
+
+.action-btn:active {
+    transform: scale(0.98);
+}
+
+.action-btn.secondary {
+    background-color: var(--cell-hover-bg);
+    color: var(--text-color);
+}
+
+.action-btn.primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.action-btn.primary:hover {
+    background-color: var(--primary-hover);
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+    opacity: 1;
+    transition: opacity 0.3s;
+}
+
+.modal-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal {
+    background: var(--cell-empty-bg);
+    padding: 2.5rem;
+    border-radius: var(--radius-lg);
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+    max-width: 400px;
+    width: 90%;
+    transform: translateY(0);
+    transition: transform 0.3s;
+}
+
+.modal-overlay.hidden .modal {
+    transform: translateY(20px);
+}
+
+.modal-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--success-color);
+}
+
+.modal h2 {
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+.modal p {
+    color: var(--secondary-color);
+    margin-bottom: 1.5rem;
+}
+
+/* Responsiveness */
+@media (max-width: 600px) {
+    .app-container {
+        padding: 1rem;
+    }
+
+    .game-board-area {
+        padding: 0.5rem;
+    }
+
+    .game-controls {
+        flex-direction: column;
+    }
+
+    .tools,
+    .actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .tool-btn,
+    .action-btn {
+        flex: 1;
+        justify-content: center;
+    }
+}
