@@ -463,35 +463,88 @@ body {
     .app-container {
         padding: 0.5rem;
         min-height: 100vh;
-        justify-content: space-between;
+        /* Ensure it fits on screen without scrolling if possible, but allow scroll if needed for controls */
+        justify-content: flex-start;
+        gap: 1rem;
+    }
+
+    /* Stack Header */
+    .game-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 0.5rem;
+        padding: 0.75rem;
+    }
+
+    .header-content h1 {
+        font-size: 1.5rem;
+    }
+
+    .header-controls {
+        width: 100%;
+        justify-content: center;
+        gap: 1rem;
     }
 
     .game-board-area {
-        padding: 0;
-        background: transparent;
-        box-shadow: none;
-        overflow: hidden;
-        align-items: center;
+        /* Ensure board takes max available space but doesn't get Crushed */
         flex: 1;
+        width: 100%;
+        margin: 0.5rem 0;
     }
 
+    .game-container {
+        /* Adjust game size calculation for mobile portrait */
+        --game-size: min(95vw, 50vh);
+    }
+
+    /* Stack Footer Controls */
     .game-controls {
         flex-direction: column;
+        gap: 0.5rem;
+        /* Sıkılaştırma */
+        padding: 0.75rem;
+        /* Azaltılmış padding */
     }
 
-    .tools,
-    .actions {
+    .tools {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
         width: 100%;
-        justify-content: space-between;
     }
 
+    .actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    /* "Kontrol Et" butonu son eleman olduğu için tam genişlik yaparız */
+    .actions .action-btn:last-child {
+        grid-column: span 2;
+    }
+
+    /* Daha Kompakt Butonlar */
     .tool-btn,
     .action-btn {
-        flex: 1;
+        padding: 0.6rem;
+        /* Küçültüldü */
+        font-size: 0.95rem;
+        /* Font biraz küçültüldü */
         justify-content: center;
+        height: auto;
     }
 
     .modal-actions {
         flex-direction: column;
+        gap: 1rem;
+    }
+
+    .modal {
+        width: 95%;
+        padding: 1.5rem;
     }
 }
