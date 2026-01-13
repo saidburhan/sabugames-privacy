@@ -311,6 +311,25 @@ body {
     padding: 0.8rem;
     font-size: 1rem;
     justify-content: center;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid var(--grid-line-color);
+    background: transparent;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--text-color);
+    transition: all 0.2s;
+}
+
+.tool-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    transform: translateY(-2px);
+    font-weight: 700;
 }
 
 .action-btn {
