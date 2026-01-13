@@ -155,6 +155,13 @@ function init() {
             muteBtn.addEventListener('click', () => soundManager.toggleMute());
         }
 
+        const helpBtn = document.getElementById('help-btn');
+        if (helpBtn) {
+            helpBtn.addEventListener('click', () => {
+                document.getElementById('tutorial-overlay').classList.remove('hidden');
+            });
+        }
+
     } catch (e) {
         console.error("UI Setup Error:", e);
     }

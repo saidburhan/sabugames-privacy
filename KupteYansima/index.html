@@ -32,7 +32,13 @@
 <body>
     <div id="ui-container">
         <header>
-            <h1>Küpte Yansıma</h1>
+            <div class="title-wrapper">
+                <h1>Küpte Yansıma</h1>
+                <div class="header-icons">
+                    <button id="mute-btn" class="btn icon-btn" aria-label="Sesi Aç/Kapat">🔊</button>
+                    <button id="help-btn" class="btn icon-btn" aria-label="Nasıl Oynanır">❓</button>
+                </div>
+            </div>
             <p>Üst yüzeydeki şeklin yansımasını yan yüzeylere çiz.</p>
         </header>
 
@@ -40,7 +46,6 @@
             <button id="check-btn" class="btn primary">Kontrol Et</button>
             <button id="reset-btn" class="btn secondary">Temizle</button>
             <button id="new-game-btn" class="btn outline">Yeni Şekil</button>
-            <button id="mute-btn" class="btn icon-btn">🔊</button>
         </div>
 
         <div id="message-toast" class="toast hidden">Doğru! Tebrikler.</div>
@@ -59,7 +64,7 @@
             </div>
             <div class="tutorial-step">
                 <span class="icon">🧩</span>
-                <p>Üst yüzeydeki desenin aynadaki yansımasını yan yüzeylere oluştur.</p>
+                <p>Üst yüzeydeki şeklin sarı renkteki ayrıtlara göre yansımalarını küpün yan yüzeylerinde oluştur.</p>
             </div>
             <button id="start-btn" class="btn primary">Başla</button>
         </div>
