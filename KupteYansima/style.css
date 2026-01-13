@@ -52,15 +52,17 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 2rem;
+    padding: 1rem 2rem;
+    /* Reduced vertical padding */
 }
 
 header {
     text-align: center;
     pointer-events: auto;
     background: linear-gradient(180deg, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
-    padding-bottom: 2rem;
-    padding-top: 1rem;
+    padding-bottom: 1rem;
+    padding-top: 0.5rem;
+    /* Reduced top padding */
 }
 
 header .title-wrapper {
