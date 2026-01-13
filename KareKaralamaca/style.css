@@ -386,7 +386,7 @@ body {
 
 .modal {
     background: var(--cell-empty-bg);
-    padding: 2.5rem;
+    padding: 2rem;
     border-radius: var(--radius-lg);
     text-align: center;
     box-shadow: var(--shadow-lg);
@@ -394,6 +394,11 @@ body {
     width: 90%;
     transform: translateY(0);
     transition: transform 0.3s;
+    max-height: 85vh;
+    /* Fit on mobile screen */
+    display: flex;
+    flex-direction: column;
+    position: relative;
 }
 
 .modal-overlay.hidden .modal {
@@ -404,6 +409,7 @@ body {
     font-size: 3rem;
     margin-bottom: 1rem;
     color: var(--success-color);
+    flex: 0 0 auto;
 }
 
 .modal-icon.warning {
@@ -419,13 +425,14 @@ body {
 .modal h2 {
     margin-bottom: 0.5rem;
     color: var(--text-color);
+    flex: 0 0 auto;
 }
 
 .modal p {
     color: var(--secondary-color);
     margin-bottom: 1.5rem;
+    flex: 0 0 auto;
 }
-
 
 /* Level Badge */
 .level-badge {
@@ -445,13 +452,37 @@ body {
     gap: 1rem;
     justify-content: center;
     width: 100%;
+    flex: 0 0 auto;
+    margin-top: auto;
+    /* Push to bottom if space permits */
 }
 
 .modal.help-modal {
     text-align: left;
     max-width: 600px;
-    position: relative;
     border: 2px solid var(--grid-thick-line-color);
+    padding: 1.5rem;
+    /* Reduced padding for mobile */
+}
+
+.help-content {
+    overflow-y: auto;
+    flex: 1 1 auto;
+    padding-right: 0.5rem;
+    /* Space for scrollbar */
+    margin-top: 1rem;
+    /* Custom Scrollbar for webkit */
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-color) var(--cell-empty-bg);
+}
+
+.help-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.help-content::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color);
+    border-radius: 3px;
 }
 
 .close-icon-btn {
