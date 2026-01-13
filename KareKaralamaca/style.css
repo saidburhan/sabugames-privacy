@@ -171,7 +171,8 @@ body {
 .game-container {
     /* Fit logic: Scale based on smallest viewport dimension */
     /* We use vmin to guarantee it fits on screen */
-    --game-size: min(95vw, 65vh);
+    /* More aggressive constraint on height to fit header/footer: 55vh */
+    --game-size: min(95vw, 55vh);
     width: var(--game-size);
     /* height: var(--game-size); - Let grid aspect ratio handle height */
 
@@ -567,5 +568,92 @@ body {
     .action-btn {
         width: auto;
         padding: 0.6rem 1.2rem;
+    }
+}
+
+/* Side-by-Side Layout for Wide but Short Screens (e.g., Laptops) */
+/* Side-by-Side Layout for Wide but Short Screens (e.g., Laptops) */
+@media (min-width: 900px) and (max-height: 850px) {
+    .app-container {
+        display: grid;
+        grid-template-columns: 1fr 260px;
+        /* Board takes space, fixed sidebar */
+        grid-template-rows: auto 1fr;
+        grid-template-areas:
+            "board header"
+            "board controls";
+        gap: 1rem;
+        padding: 1rem;
+        max-width: 1400px;
+        align-items: start;
+        overflow: hidden;
+        /* Prevent scroll */
+    }
+
+    /* Assign Grid Areas */
+    .game-board-area {
+        grid-area: board;
+        width: 100%;
+        height: 100%;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .game-header {
+        grid-area: header;
+        flex-direction: column;
+        width: 100%;
+        padding: 1rem;
+        gap: 1rem;
+        align-self: end;
+        /* Push to bottom of its cell if needed */
+    }
+
+    .game-controls {
+        grid-area: controls;
+        flex-direction: column;
+        width: 100%;
+        padding: 1rem;
+        gap: 0.8rem;
+        overflow-y: auto;
+        /* Allow scroll if controls get too tall */
+        justify-content: flex-start;
+    }
+
+    /* Sidebar Internal Styling */
+    .header-content h1 {
+        font-size: 1.2rem;
+        /* Smaller Title */
+    }
+
+    .header-controls {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .tools,
+    .actions {
+        flex-direction: column;
+        width: 100%;
+        gap: 0.5rem;
+    }
+
+    .actions .action-btn:last-child {
+        grid-column: auto;
+    }
+
+    .tool-btn,
+    .action-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 0.6rem;
+        font-size: 0.9rem;
+        /* Compact Font */
+    }
+
+    /* Game Board Sizing */
+    .game-container {
+        /* Use almost full height since sidebars are gone */
+        --game-size: min(90vw, 90vh);
     }
 }
