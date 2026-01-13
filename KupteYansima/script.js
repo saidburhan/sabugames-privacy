@@ -413,22 +413,44 @@ function createStarField() {
 }
 
 // --- Interaction ---
+// --- Interaction ---
 function onPointerMove(event) {
-    pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
-    pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    updatePointer(event);
 }
 
 function onPointerDown(event) {
     isDragging = false;
-    pointerDownPos.x = event.clientX;
-    pointerDownPos.y = event.clientY;
+    // Handle both PointerEvent and TouchEvent if needed, though PointerEvent covers most
+    const x = event.clientX || (event.touches && event.touches[0].clientX);
+    const y = event.clientY || (event.touches && event.touches[0].clientY);
+    pointerDownPos.x = x;
+    pointerDownPos.y = y;
+    updatePointer(event);
 }
 
 function onPointerUp(event) {
-    const dx = event.clientX - pointerDownPos.x;
-    const dy = event.clientY - pointerDownPos.y;
-    if (Math.abs(dx) < 5 && Math.abs(dy) < 5) {
+    const x = event.clientX || (event.changedTouches && event.changedTouches[0].clientX);
+    const y = event.clientY || (event.changedTouches && event.changedTouches[0].clientY);
+
+    const dx = x - pointerDownPos.x;
+    const dy = y - pointerDownPos.y;
+
+    // Update pointer for exact raycast at lift-off
+    pointer.x = (x / window.innerWidth) * 2 - 1;
+    pointer.y = -(y / window.innerHeight) * 2 + 1;
+
+    // Increase threshold slightly for touch devices
+    if (Math.abs(dx) < 10 && Math.abs(dy) < 10) {
         handleTap();
+    }
+}
+
+function updatePointer(event) {
+    const x = event.clientX || (event.touches && event.touches[0].clientX);
+    const y = event.clientY || (event.touches && event.touches[0].clientY);
+    if (x !== undefined && y !== undefined) {
+        pointer.x = (x / window.innerWidth) * 2 - 1;
+        pointer.y = -(y / window.innerHeight) * 2 + 1;
     }
 }
 
