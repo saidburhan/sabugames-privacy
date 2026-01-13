@@ -102,28 +102,31 @@ body {
     flex: 0 0 auto;
     width: 100%;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    /* Single line forced */
+    justify-content: space-between;
     align-items: center;
-    text-align: center;
     gap: 0.5rem;
     background: var(--cell-empty-bg);
-    padding: 0.75rem;
+    padding: 0.75rem 1rem;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
 }
 
 .header-controls {
-    width: 100%;
+    width: auto;
     display: flex;
-    justify-content: center;
-    gap: 1rem;
+    justify-content: flex-end;
+    gap: 0.8rem;
 }
 
 .header-content h1 {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
+    /* Slightly smaller to fit on one line */
     font-weight: 700;
     color: var(--primary-color);
     margin-bottom: 0px;
+    white-space: nowrap;
 }
 
 .header-content p {
@@ -668,23 +671,46 @@ body {
 }
 
 /* Aggressive Vertical Shrink for Short Mobile Screens */
-@media (max-height: 700px) and (max-width: 899px) {
-    .game-header {
+/* Aggressive Vertical Shrink for Short Mobile Screens */
+@media (max-height: 720px) and (max-width: 899px) {
+    .app-container {
         padding: 0.25rem;
         gap: 0.25rem;
     }
 
+    .game-header {
+        flex-direction: row;
+        /* Single line */
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.25rem 0.5rem;
+        gap: 0.5rem;
+        min-height: auto;
+    }
+
     .header-content h1 {
         font-size: 1rem;
+        margin: 0;
+        white-space: nowrap;
+        /* Prevent wrap */
     }
 
     .header-controls {
-        gap: 0.5rem;
+        width: auto;
+        /* Take only needed space */
+        gap: 0.4rem;
+        margin-top: 0;
+        justify-content: flex-end;
+    }
+
+    .level-badge {
+        padding: 0.1rem 0.5rem;
+        font-size: 0.75rem;
     }
 
     .icon-btn {
-        padding: 0.25rem;
-        font-size: 1rem;
+        padding: 0.2rem;
+        font-size: 0.9rem;
     }
 
     .game-controls {
@@ -692,20 +718,29 @@ body {
         gap: 0.25rem;
     }
 
+    .tools,
+    .actions {
+        gap: 0.25rem;
+    }
+
     .tool-btn,
     .action-btn {
-        padding: 0.4rem;
-        font-size: 0.85rem;
+        padding: 0.3rem 0.2rem;
+        /* Vertical compress */
+        font-size: 0.8rem;
+        min-height: 0;
+        gap: 0.25rem;
     }
 
     .game-board-area {
-        /* Allow slightly more height since we shrank controls */
-        /* But importantly, rely on flex mechanics */
+        padding: 0;
+        margin: 0 !important;
     }
 
     .game-container {
         /* Force resize if aspect ratio pushes height */
         /* width calculation needs to consider height constraint explicitly */
-        --game-size: min(95vw, 65vh);
+        /* Critically reduced to 50vh to guarantee fit with controls */
+        --game-size: min(98vw, 50vh);
     }
 }
