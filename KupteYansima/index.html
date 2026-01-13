@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Küpte Yansıma</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script>
+        window.addEventListener('error', function (event) {
+            console.error(event);
+            // Ignore trivial resize errors or extension errors
+            if (event.filename && !event.filename.includes('extension')) {
+                alert("Hata oluştu (Script Error): " + event.message + "\n\nKonum: " + event.filename + ":" + event.lineno);
+            }
+        });
+    </script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+
+<body>
+    <div id="ui-container">
+        <header>
+            <h1>Küpte Yansıma</h1>
+            <p>Üst yüzeydeki şeklin yansımasını yan yüzeylere çiz.</p>
+        </header>
+
+        <div id="controls">
+            <button id="check-btn" class="btn primary">Kontrol Et</button>
+            <button id="reset-btn" class="btn secondary">Temizle</button>
+            <button id="new-game-btn" class="btn outline">Yeni Şekil</button>
+            <button id="mute-btn" class="btn icon-btn">🔊</button>
+        </div>
+
+        <div id="message-toast" class="toast hidden">Doğru! Tebrikler.</div>
+    </div>
+
+    <div id="tutorial-overlay" class="overlay">
+        <div class="modal">
+            <h2>Nasıl Oynanır?</h2>
+            <div class="tutorial-step">
+                <span class="icon">🖱️</span>
+                <p>Küpü çevirmek için boşluğa tıklayıp sürükle.</p>
+            </div>
+            <div class="tutorial-step">
+                <span class="icon">🎨</span>
+                <p>Küçük küplere tıklayarak boya veya sil.</p>
+            </div>
+            <div class="tutorial-step">
+                <span class="icon">🧩</span>
+                <p>Üst yüzeydeki desenin aynadaki yansımasını yan yüzeylere oluştur.</p>
+            </div>
+            <button id="start-btn" class="btn primary">Başla</button>
+        </div>
+    </div>
+
+    <canvas id="game-canvas"></canvas>
+
+    <script type="module" src="script.js"></script>
+</body>
+
+</html>
