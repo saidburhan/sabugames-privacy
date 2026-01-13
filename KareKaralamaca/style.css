@@ -653,7 +653,12 @@ body {
 
     /* Game Board Sizing */
     .game-container {
-        /* Use almost full height since sidebars are gone */
-        --game-size: min(90vw, 90vh);
+        /* Relax vertical constraint but leave space for padding (was 90vh) */
+        --game-size: min(90vw, 82vh);
+    }
+
+    .game-board-area {
+        padding-bottom: 1rem;
+        /* Extra safety buffer */
     }
 }
