@@ -459,7 +459,7 @@ body {
 }
 
 /* Responsiveness */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     .app-container {
         padding: 0.5rem;
         min-height: 100vh;

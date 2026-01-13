@@ -74,11 +74,11 @@ const levels = [
         cols: [[2, 1], [2, 1], [3], [3], [2, 1], [2, 1]]
     },
 
-    // Level 12: 9x9 Propeller (Pervane) - Verified
+    // Level 12: 9x9 Lightning (Yıldırım) - Verified
     {
-        name: "Pervane",
-        rows: [[4, 1], [3, 2], [2, 3], [1, 4], [9], [4, 1], [3, 2], [2, 3], [1, 4]],
-        cols: [[4, 1], [3, 2], [2, 3], [1, 4], [9], [4, 1], [3, 2], [2, 3], [1, 4]]
+        name: "Yıldırım",
+        rows: [[1], [1, 2], [1, 4], [2, 3], [5], [3, 2], [4, 1], [2, 1], [1]],
+        cols: [[1], [3], [5], [7], [2, 2], [7], [5], [3], [1]]
     },
 
     // Level 13: 10x10 Bow Tie (Papyon) - Verified
