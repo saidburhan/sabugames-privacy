@@ -97,18 +97,26 @@ body {
     gap: 0.5rem;
 }
 
-/* Header - Compact */
+/* Header - Compact (Mobile Default) */
 .game-header {
     flex: 0 0 auto;
-    /* Don't grow/shrink */
     width: 100%;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
+    text-align: center;
+    gap: 0.5rem;
     background: var(--cell-empty-bg);
-    padding: 0.5rem 1rem;
+    padding: 0.75rem;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
+}
+
+.header-controls {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
 }
 
 .header-content h1 {
@@ -268,46 +276,41 @@ body {
     opacity: 0.8;
 }
 
-/* Footer Controls */
+/* Footer Controls (Mobile Default) */
 .game-controls {
     width: 100%;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 1rem;
+    flex-direction: column;
+    gap: 0.5rem;
     background: var(--cell-empty-bg);
-    padding: 1rem;
+    padding: 0.75rem;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
 }
 
 .tools {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 0.5rem;
-}
-
-.tool-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.6rem 1.2rem;
-    border: 1px solid var(--grid-line-color);
-    background: transparent;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    font-weight: 500;
-    color: var(--text-color);
-}
-
-.tool-btn.active {
-    background-color: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
+    width: 100%;
 }
 
 .actions {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 0.5rem;
+    width: 100%;
+}
+
+.actions .action-btn:last-child {
+    grid-column: span 2;
+}
+
+.tool-btn,
+.action-btn {
+    padding: 0.8rem;
+    font-size: 1rem;
+    justify-content: center;
 }
 
 .action-btn {
@@ -459,92 +462,50 @@ body {
 }
 
 /* Responsiveness */
-@media (max-width: 768px) {
+/* Desktop Overrides */
+@media (min-width: 769px) {
     .app-container {
-        padding: 0.5rem;
-        min-height: 100vh;
-        /* Ensure it fits on screen without scrolling if possible, but allow scroll if needed for controls */
-        justify-content: flex-start;
-        gap: 1rem;
+        justify-content: space-between;
     }
 
-    /* Stack Header */
     .game-header {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        gap: 0.5rem;
-        padding: 0.75rem;
-    }
-
-    .header-content h1 {
-        font-size: 1.5rem;
+        flex-direction: row;
+        justify-content: space-between;
+        text-align: left;
+        padding: 0.5rem 1rem;
     }
 
     .header-controls {
-        width: 100%;
-        justify-content: center;
-        gap: 1rem;
+        width: auto;
+        justify-content: flex-end;
     }
 
-    .game-board-area {
-        /* Ensure board takes max available space but doesn't get Crushed */
-        flex: 1;
-        width: 100%;
-        margin: 0.5rem 0;
-    }
-
-    .game-container {
-        /* Adjust game size calculation for mobile portrait */
-        --game-size: min(95vw, 50vh);
-    }
-
-    /* Stack Footer Controls */
     .game-controls {
-        flex-direction: column;
-        gap: 0.5rem;
-        /* Sıkılaştırma */
-        padding: 0.75rem;
-        /* Azaltılmış padding */
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
     }
 
     .tools {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
+        display: flex;
+        width: auto;
         gap: 0.5rem;
-        width: 100%;
     }
 
     .actions {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
+        display: flex;
+        width: auto;
         gap: 0.5rem;
-        width: 100%;
     }
 
-    /* "Kontrol Et" butonu son eleman olduğu için tam genişlik yaparız */
     .actions .action-btn:last-child {
-        grid-column: span 2;
+        grid-column: auto;
     }
 
-    /* Daha Kompakt Butonlar */
     .tool-btn,
     .action-btn {
-        padding: 0.6rem;
-        /* Küçültüldü */
-        font-size: 0.95rem;
-        /* Font biraz küçültüldü */
-        justify-content: center;
-        height: auto;
-    }
-
-    .modal-actions {
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .modal {
-        width: 95%;
-        padding: 1.5rem;
+        width: auto;
+        padding: 0.6rem 1.2rem;
     }
 }
