@@ -169,12 +169,16 @@ body {
 }
 
 .game-container {
-    /* Fit logic: Scale based on smallest viewport dimension */
-    /* We use vmin to guarantee it fits on screen */
-    /* More aggressive constraint on height to fit header/footer: 55vh */
-    --game-size: min(95vw, 55vh);
+    /* Fit logic: Scale based on available space */
+    /* We limit the width/height to ensure it fits in the flexible game-board-area */
+    /* Mobile/Default: Use viewport width mainly, but constrained by height */
+    --game-size: min(95vw, 60vh);
+    /* Fallback */
+
     width: var(--game-size);
-    /* height: var(--game-size); - Let grid aspect ratio handle height */
+    /* Ensure it never exceeds the flex parent's height */
+    max-height: 100%;
+    max-width: 100%;
 
     /* Center in parent */
     margin: auto;
@@ -660,5 +664,48 @@ body {
     .game-board-area {
         padding-bottom: 1rem;
         /* Extra safety buffer */
+    }
+}
+
+/* Aggressive Vertical Shrink for Short Mobile Screens */
+@media (max-height: 700px) and (max-width: 899px) {
+    .game-header {
+        padding: 0.25rem;
+        gap: 0.25rem;
+    }
+
+    .header-content h1 {
+        font-size: 1rem;
+    }
+
+    .header-controls {
+        gap: 0.5rem;
+    }
+
+    .icon-btn {
+        padding: 0.25rem;
+        font-size: 1rem;
+    }
+
+    .game-controls {
+        padding: 0.25rem;
+        gap: 0.25rem;
+    }
+
+    .tool-btn,
+    .action-btn {
+        padding: 0.4rem;
+        font-size: 0.85rem;
+    }
+
+    .game-board-area {
+        /* Allow slightly more height since we shrank controls */
+        /* But importantly, rely on flex mechanics */
+    }
+
+    .game-container {
+        /* Force resize if aspect ratio pushes height */
+        /* width calculation needs to consider height constraint explicitly */
+        --game-size: min(95vw, 65vh);
     }
 }
