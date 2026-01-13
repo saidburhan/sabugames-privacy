@@ -85,23 +85,117 @@
                 <button class="close-icon-btn" id="btn-close-help"><i class="fas fa-times"></i></button>
                 <h2>Nasıl Oynanır?</h2>
                 <div class="help-content">
-                    <p><strong>Amaç:</strong> Satır ve sütunların başındaki sayılara göre kareleri boyayarak gizli resmi
-                        ortaya çıkar.</p>
-                    <ul>
-                        <li><i class="fas fa-arrows-alt-h"></i> Birden fazla sayı varsa (örn: 3 1), aralarında en az bir
-                            boşluk olmalıdır.</li>
-                        <li><i class="fas fa-mouse-pointer"></i> <strong>Tıkla:</strong> Sol tık boyama yapar, sağ tık
-                            ise boş kareleri işaretler (kilitler).</li>
-                        <li><i class="fas fa-times"></i> <strong>Boş/Kilitle:</strong> Emin olduğun boş kareleri
-                            işaretlemek için bu aracı da kullanabilirsin.</li>
-                    </ul>
+                    <p style="margin-bottom: 1rem; font-size: 0.95rem; color: var(--text-color); line-height: 1.5;">
+                        Her satırın başında ve sütunun üstünde bulunan sayılar bulundukları satır ve sütun içinde
+                        karalanacak kare sayısını göstermektedir. Örneğin <strong>1 ve 3</strong> rakamları; önce bir
+                        kare
+                        karalanacağını, boşluk bırakıldıktan sonra 3 kare daha karalanacağını gösterir.
+                        Hangi karelerin karalanacağını oyuncu bulacaktır.
+                    </p>
+
+                    <div style="display: flex; justify-content: center; margin-bottom: 1.5rem;">
+                        <div
+                            style="display: grid; grid-template-columns: 30px repeat(5, 30px); gap: 1px; background: #94a3b8; border: 2px solid #64748b; padding: 1px;">
+                            <!-- Top Row (Col Clues): 5, 1, 3, 1, 1 -->
+                            <div style="background: #fff8ee;"></div>
+                            <div
+                                style="background: #fee6c5; display: flex; align-items: end; justify-content: center; font-size: 12px; font-weight: bold; padding-bottom: 2px;">
+                                5</div>
+                            <div
+                                style="background: #fee6c5; display: flex; align-items: end; justify-content: center; font-size: 12px; font-weight: bold; padding-bottom: 2px;">
+                                1</div>
+                            <div
+                                style="background: #fee6c5; display: flex; align-items: end; justify-content: center; font-size: 12px; font-weight: bold; padding-bottom: 2px;">
+                                3</div>
+                            <div
+                                style="background: #fee6c5; display: flex; align-items: end; justify-content: center; font-size: 12px; font-weight: bold; padding-bottom: 2px;">
+                                1</div>
+                            <div
+                                style="background: #fee6c5; display: flex; align-items: end; justify-content: center; font-size: 12px; font-weight: bold; padding-bottom: 2px;">
+                                1</div>
+
+                            <!-- Row 1: 1 3 (Matches Example) -> X . X X X -->
+                            <div
+                                style="background: #fee6c5; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 10px; font-weight: bold; line-height: 1.1;">
+                                <span>1</span><span>3</span>
+                            </div>
+                            <div style="background: #334155;"></div>
+                            <div style="background: #fff;"></div>
+                            <div style="background: #334155;"></div>
+                            <div style="background: #334155;"></div>
+                            <div style="background: #334155;"></div>
+
+                            <!-- Row 2: 1 1 -> X . X . . -->
+                            <div
+                                style="background: #fee6c5; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 10px; font-weight: bold; line-height: 1.1;">
+                                <span>1</span><span>1</span>
+                            </div>
+                            <div style="background: #334155;"></div>
+                            <div style="background: #fff;"></div>
+                            <div style="background: #334155;"></div>
+                            <div style="background: #fff;"></div>
+                            <div style="background: #fff;"></div>
+
+                            <!-- Row 3: 3 -> X X X . . -->
+                            <div
+                                style="background: #fee6c5; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: bold;">
+                                3</div>
+                            <div style="background: #334155;"></div>
+                            <div style="background: #334155;"></div>
+                            <div style="background: #334155;"></div>
+                            <div style="background: #fff;"></div>
+                            <div style="background: #fff;"></div>
+
+                            <!-- Row 4: 1 -> X . . . . -->
+                            <div
+                                style="background: #fee6c5; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: bold;">
+                                1</div>
+                            <div style="background: #334155;"></div>
+                            <div style="background: #fff;"></div>
+                            <div style="background: #fff;"></div>
+                            <div style="background: #fff;"></div>
+                            <div style="background: #fff;"></div>
+
+                            <!-- Row 5: 1 -> X . . . . -->
+                            <div
+                                style="background: #fee6c5; display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: bold;">
+                                1</div>
+                            <div style="background: #334155;"></div>
+                            <div style="background: #fff;"></div>
+                            <div style="background: #fff;"></div>
+                            <div style="background: #fff;"></div>
+                            <div style="background: #fff;"></div>
+                        </div>
+                    </div>
+
+                    <div style="border-top: 1px solid var(--grid-line-color); padding-top: 1rem;">
+                        <p><strong>Kontroller:</strong></p>
+                        <ul>
+                            <li><i class="fas fa-arrows-alt-h"></i> Birden fazla sayı varsa (örn: 3 1), aralarında en az
+                                bir
+                                boşluk olmalıdır.</li>
+                            <li><i class="fas fa-mouse-pointer"></i> <strong>Tıkla:</strong> Sol tık boyama yapar, sağ
+                                tık
+                                ise boş kareleri işaretler (kilitler).</li>
+                            <li><i class="fas fa-times"></i> <strong>Boş/Kilitle:</strong> Emin olduğun boş kareleri
+                                işaretlemek için bu aracı da kullanabilirsin.</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script src="script.js"></script>
+        <div id="generic-modal-overlay" class="modal-overlay hidden">
+            <div class="modal">
+                <div class="modal-icon" id="generic-modal-icon"></div>
+                <h2 id="generic-modal-title"></h2>
+                <p id="generic-modal-message"></p>
+                <div class="modal-actions" id="generic-modal-actions"></div>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+        <script src="script.js"></script>
 </body>
 
 </html>

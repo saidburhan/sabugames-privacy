@@ -406,6 +406,16 @@ body {
     color: var(--success-color);
 }
 
+.modal-icon.warning {
+    color: #f59e0b;
+    /* Amber/Orange */
+}
+
+.modal-icon.error {
+    color: var(--accent-color);
+    /* Red */
+}
+
 .modal h2 {
     margin-bottom: 0.5rem;
     color: var(--text-color);
@@ -439,7 +449,7 @@ body {
 
 .modal.help-modal {
     text-align: left;
-    max-width: 500px;
+    max-width: 600px;
     position: relative;
     border: 2px solid var(--grid-thick-line-color);
 }

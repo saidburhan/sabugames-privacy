@@ -592,9 +592,9 @@ document.addEventListener('DOMContentLoaded', () => {
     btnEmpty.addEventListener('click', () => updateTools('empty'));
 
     document.getElementById('btn-reset').addEventListener('click', () => {
-        if (confirm('Tahtayı temizlemek istediğine emin misin?')) {
+        showGenericModal('warning', 'Temizle', 'Tahtayı temizlemek istediğine emin misin?', () => {
             game.reset();
-        }
+        });
     });
 
     const modalOverlay = document.getElementById('modal-overlay');
@@ -617,7 +617,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.querySelector('.modal p').textContent = 'Bulmacayı başarıyla tamamladın.';
             }
         } else {
-            alert('Henüz doğru değil, hataları kontrol et!');
+            showGenericModal('error', 'Hatalı!', 'Maalesef henüz çözüm doğru değil. Kontrol edip tekrar dene.');
         }
     });
 
@@ -636,11 +636,54 @@ document.addEventListener('DOMContentLoaded', () => {
     // Baştan Başla (Restart All) Button
     if (document.getElementById('btn-restart-all')) {
         document.getElementById('btn-restart-all').addEventListener('click', () => {
-            if (confirm('Tüm ilerlemen sıfırlanacak ve Level 1\'e döneceksin. Emin misin?')) {
+            showGenericModal('warning', 'Baştan Başla', 'Tüm ilerlemen sıfırlanacak ve Level 1\'e döneceksin. Emin misin?', () => {
                 localStorage.removeItem('kareKaralamaca_level');
                 game.loadLevel(0);
-            }
+            });
         });
+    }
+
+    // Modal Utility
+    function showGenericModal(type, title, message, onConfirm) {
+        const overlay = document.getElementById('generic-modal-overlay');
+        const iconContainer = document.getElementById('generic-modal-icon');
+        const titleEl = document.getElementById('generic-modal-title');
+        const msgEl = document.getElementById('generic-modal-message');
+        const actionsEl = document.getElementById('generic-modal-actions');
+
+        // Reset classes
+        iconContainer.className = 'modal-icon ' + type;
+
+        // Set Icon
+        let iconHtml = '';
+        if (type === 'warning') iconHtml = '<i class="fas fa-exclamation-triangle"></i>';
+        else if (type === 'error') iconHtml = '<i class="fas fa-times-circle"></i>';
+        else iconHtml = '<i class="fas fa-info-circle"></i>';
+
+        iconContainer.innerHTML = iconHtml;
+        titleEl.textContent = title;
+        msgEl.textContent = message;
+
+        // Build Buttons
+        actionsEl.innerHTML = '';
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'action-btn secondary';
+        closeBtn.textContent = onConfirm ? 'Vazgeç' : 'Kapat';
+        closeBtn.onclick = () => overlay.classList.add('hidden');
+        actionsEl.appendChild(closeBtn);
+
+        if (onConfirm) {
+            const confirmBtn = document.createElement('button');
+            confirmBtn.className = 'action-btn primary';
+            confirmBtn.textContent = 'Evet';
+            confirmBtn.onclick = () => {
+                overlay.classList.add('hidden');
+                onConfirm();
+            };
+            actionsEl.appendChild(confirmBtn);
+        }
+
+        overlay.classList.remove('hidden');
     }
 
     // Help Modal
@@ -662,6 +705,9 @@ document.addEventListener('DOMContentLoaded', () => {
             helpModal.classList.add('hidden');
         }
     });
+
+    // Auto-open help on start
+    helpModal.classList.remove('hidden');
 
     // Theme Toggle
     const themeBtn = document.getElementById('theme-toggle');
