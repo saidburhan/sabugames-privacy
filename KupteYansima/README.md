@@ -11,7 +11,7 @@ Bu proje tamamen statik bir web sitesidir.
 **Not:** `server.py` dosyası artık gerekmediği için kaldırılmıştır. GitHub Pages ve diğer statik sunucular projeyi sorunsuz çalıştırır.
 
 ## Oynanış
-1. **Döndürme**: Farenin sol tuşuna basılı tutup sürükleyerek küpü çevirin.
-2. **Boyama**: Küpün yan yüzeylerindeki küçük karelere tıklayarak boyayın.
-3. **Amaç**: Üst yüzeydeki şeklin, kenarlardan yansımasını (simetrisini) yan yüzeylere oluşturun.
+1. **Amaç**: Küpün üst yüzeyinde mavi renkle gösterilen deseni sarı renkteki ayrıtlara göre yansıtarak küpün yan yüzeylerinde yeni desenler oluşturunuz.
+2. **Boyama**: Küpün yüzeyindeki birim karelere tıklayarak boyayabilir veya silebilirsiniz.
+3. **Döndürme**: Küpü çevirmek için boşluğa tıklayarak veya dokunarak hareket ettiriniz.
 4. **Kontrol**: Bitirdiğinizde "KONTROL ET" butonuna basın.
