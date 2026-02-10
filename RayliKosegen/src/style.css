@@ -1,0 +1,284 @@
+:root {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.5;
+  color: #333;
+  background-color: #f0f0f0;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background-color: #f0f0f0;
+  width: 100vw;
+  height: 100vh;
+}
+
+canvas {
+  display: block;
+  outline: none;
+}
+
+#info {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: auto;
+  max-width: 300px;
+  text-align: left;
+  z-index: 100;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+#info h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 1.2rem;
+  color: #2c3e50;
+}
+
+#info p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+#math-panel {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 300px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.input-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.input-group label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #34495e;
+}
+
+.input-group input {
+  width: 70px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input-group input:focus {
+  border-color: #3498db;
+}
+
+.result-box {
+  background: #f8f9fa;
+  border: 1px solid #eee;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.result-row {
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+}
+
+.result-row:last-child {
+  margin-bottom: 0;
+}
+
+.result-label {
+  font-weight: 600;
+  color: #7f8c8d;
+  margin-bottom: 4px;
+  display: block;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+#math-area {
+  font-weight: bold;
+}
+
+/* Label styling for 3D scene */
+.label {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+  pointer-events: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: opacity 0.2s;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  #info {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    max-width: none;
+    width: auto;
+    padding: 6px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  #info h3 {
+    margin: 0;
+    font-size: 0.9rem;
+    margin-right: 8px;
+  }
+
+  #info p {
+    font-size: 0.75rem;
+    text-align: right;
+    line-height: 1;
+    margin: 0;
+  }
+
+  #info br {
+    display: none;
+  }
+
+  #math-panel {
+    top: auto;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    width: auto;
+    border-radius: 12px;
+    padding: 6px 10px;
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Input row */
+  #math-panel .input-group {
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 2px;
+  }
+
+  #math-panel .input-group label {
+    font-size: 0.8rem;
+  }
+
+  #math-panel .input-group input {
+    width: 45px;
+    padding: 2px;
+    font-size: 0.85rem;
+    height: 22px;
+    border-radius: 4px;
+  }
+
+  /* Result container - ultra compact inline */
+  .result-box {
+    padding: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    background: transparent;
+    border: none;
+  }
+
+  .result-row {
+    margin: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Hide labels "Kenar Uzunlukları:" etc */
+  .result-label {
+    display: none;
+  }
+
+  /* Force a,b,c side-by-side */
+  #math-edges {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  /* Reduce math font size */
+  #math-edges>div {
+    font-size: 0.85rem !important;
+    line-height: 1;
+  }
+
+  /* Area part */
+  #math-area {
+    font-size: 0.9rem !important;
+    /* Override JS inline style */
+    margin-left: 5px;
+  }
+
+  /* Katex specific overrides for compactness */
+  .katex {
+    font-size: 0.9em !important;
+  }
+}
+
+@media (max-width: 480px) {
+  #info {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px;
+  }
+
+  #info h3 {
+    margin-bottom: 2px;
+    margin-right: 0;
+  }
+
+  #info p {
+    text-align: center;
+  }
+
+  #math-edges {
+    gap: 8px;
+  }
+
+  #math-edges>div {
+    font-size: 0.8rem !important;
+  }
+}
