@@ -4,9 +4,12 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>3D Kombinatorik Materyali</title>
-  <script type="module" crossorigin src="/Kombinatorik/assets/index-C7KtzAsr.js"></script>
-  <link rel="stylesheet" crossorigin href="/Kombinatorik/assets/index-BhQQlWV3.css">
+    <title>3D Kombinatorik Materyali</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet" />
+  <script type="module" crossorigin src="/Kombinatorik/assets/index-DTMRcWt7.js"></script>
+  <link rel="stylesheet" crossorigin href="/Kombinatorik/assets/index-CbbJLXNB.css">
 </head>
 
 <body>
@@ -20,10 +23,10 @@
                 <section>
                     <h3>Tanıtım</h3>
                     <p>Bu 3D dijital eğitim materyali, 10x10 boyutlarında mavi bir tabla üzerinde renkli silindirlerin
-                        dizilimiyle kombinasyon ve permütasyon kavramlarını somutlaştırmak için tasarlanmıştır. Sağ
+                        dizilimiyle seçme ve sıralama kavramlarını somutlaştırmak için tasarlanmıştır. Sağ
                         taraftaki renk paletinden dilediğiniz renkleri seçebilir, yeni canlı renkler ekleyebilir veya
                         mevcut renkleri silebilirsiniz. Silindirleri tabladaki çivilerin üzerine sürükleyerek farklı
-                        kombinasyonlar oluşturabilirsiniz.</p>
+                        gruplar oluşturabilirsiniz.</p>
                 </section>
 
                 <section>
@@ -31,24 +34,14 @@
                     <p>Kombinatorik materyali aşağıdaki başlıkların öğretiminde kullanılabilir:</p>
                     <ul>
                         <li>Olayların gerçekleşme sayısının hesaplanması,</li>
-                        <li>n çeşit nesne ile oluşturulabilecek r'li dizilişlerin (permütasyonların) hesaplanması,</li>
-                        <li>n elemanlı bir kümenin r tane elemanının kaç farklı şekilde seçilebileceğinin (kombinasyon)
+                        <li>n çeşit nesne ile oluşturulabilecek r'li dizilişlerin hesaplanması,</li>
+                        <li>n elemanlı bir kümenin r tane elemanının kaç farklı şekilde seçilebileceğinin
                             hesaplanması,</li>
                         <li>Olasılık kavramı ile ilgili görselleştirmeler.</li>
                     </ul>
                 </section>
 
-                <section>
-                    <h3>Kazanımlar</h3>
-                    <ul>
-                        <li>Olayların gerçekleşme sayısını toplama ve çarpma yöntemlerini kullanarak hesaplar.</li>
-                        <li>n çeşit nesne ile oluşturulabilecek r'li dizilişlerin (permütasyon) kaç farklı şekilde
-                            yapılabileceğini hesaplar.</li>
-                        <li>Sınırlı sayıda tekrarlayan nesnelerin dizilişlerini açıklayarak problemleri çözer.</li>
-                        <li>n elemanlı bir kümenin r tane elemanının kaç farklı şekilde seçilebileceğini hesaplar.</li>
-                        <li>Olasılık kavramı ile ilgili somut uygulamalar yapar.</li>
-                    </ul>
-                </section>
+
             </div>
             <div class="modal-footer">
                 <button id="start-app-btn">Uygulamaya Başla</button>
@@ -72,12 +65,27 @@
         </div>
     </div>
 
+    <!-- Completion Modal (Consistent UI) -->
+    <div id="completion-modal" class="modal" style="display: none; opacity: 0; pointer-events: none;">
+        <div class="modal-content completion-content-simple">
+            <div class="modal-header">
+                <h2>Tebrikler!</h2>
+            </div>
+            <div class="modal-body" style="text-align: center; padding: 40px 20px;">
+                <p style="font-size: 1.1rem; color: #ccc;">Tüm soruları başarıyla tamamladınız.</p>
+            </div>
+            <div class="modal-footer" style="justify-content: center;">
+                <button id="restart-btn" class="modal-btn" style="background: #2979FF; color: white;">Başa Dön</button>
+            </div>
+        </div>
+    </div>
+
     <div id="canvas-container"></div>
 
     <!-- Left Side Panel (Question + History) -->
     <div id="left-panel">
         <div id="info">
-            <h1>Kombinatorik Materyali</h1>
+            <h1 id="app-title">Kombinatorik Materyali</h1>
 
             <div id="question-area">
                 <div id="question-text">Soru yükleniyor...</div>
