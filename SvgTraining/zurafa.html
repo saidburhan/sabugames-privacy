@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İnteraktif Zürafa</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #2c3e50;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        #svg-container {
+            width: 100%;
+            max-width: 900px;
+            height: 90vh;
+            background: linear-gradient(to bottom, #87CEEB 0%, #a1d1e6 60%, #e0f2fe 100%);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* SVG alanındaki metinlerin veya çizimlerin yanlışlıkla seçilmesini engelliyoruz */
+        svg {
+            display: block;
+            width: 100%;
+            height: 100%;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Bulutların yavaşça hareket etmesi için ufak bir animasyon */
+        .cloud {
+            animation: float 25s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateX(-150px);
+            }
+
+            100% {
+                transform: translateX(1000px);
+            }
+        }
+
+        /* Kafa üzerine gelindiğinde farenin işaretçisi değişsin */
+        #head {
+            cursor: grab;
+            transition: transform 0.05s linear;
+            /* Sürükleme hissiyatını yumuşatır */
+        }
+
+        #head:active {
+            cursor: grabbing;
+        }
+
+        /* Kullanıcıyı yönlendiren bilgi metni */
+        .instruction {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: bold;
+            color: #2c3e50;
+            pointer-events: none;
+            /* Mouse olaylarını arka plana iletir */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            font-size: 18px;
+            z-index: 10;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="svg-container">
+        <div class="instruction">🦒 Zürafanın kafasını fare ile tutup sürükle!</div>
+
+        <!-- SVG Çizimi Başlangıcı -->
+        <svg id="game-svg" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid meet">
+
+            <!-- --- ARKA PLAN DETAYLARI --- -->
+
+            <g class="cloud" transform="translate(100, 100)" fill="#ffffff" opacity="0.8">
+                <circle cx="0" cy="0" r="30" />
+                <circle cx="25" cy="-15" r="35" />
+                <circle cx="50" cy="0" r="25" />
+                <rect x="0" y="-5" width="50" height="35" />
+            </g>
+            <g class="cloud" transform="translate(450, 150) scale(0.7)" fill="#ffffff" opacity="0.6"
+                style="animation-delay: -10s;">
+                <circle cx="0" cy="0" r="30" />
+                <circle cx="25" cy="-15" r="35" />
+                <circle cx="50" cy="0" r="25" />
+                <rect x="0" y="-5" width="50" height="35" />
+            </g>
+
+            <!-- Güneş -->
+            <circle cx="700" cy="100" r="50" fill="#FFD700" />
+
+            <!-- Zemin -->
+            <rect x="0" y="450" width="800" height="150" fill="#2ECC71" />
+            <!-- Çimen Detayları -->
+            <path d="M 100 450 L 110 430 L 120 450 Z" fill="#27AE60" />
+            <path d="M 250 450 L 255 425 L 265 450 Z" fill="#27AE60" />
+            <path d="M 650 450 L 660 415 L 670 450 Z" fill="#27AE60" />
+
+            <!-- Ağaç (Zürafanın sol arka tarafında) -->
+            <g transform="translate(150, 450)">
+                <!-- Gövde -->
+                <rect x="-15" y="-150" width="30" height="150" fill="#795548" />
+                <!-- Yapraklar -->
+                <circle cx="0" cy="-150" r="60" fill="#229954" />
+                <circle cx="-40" cy="-120" r="50" fill="#27AE60" />
+                <circle cx="40" cy="-120" r="50" fill="#27AE60" />
+                <circle cx="0" cy="-190" r="55" fill="#2ECC71" />
+
+                <!-- Elma -->
+                <g id="apple" transform="translate(10, -160) scale(1.6)">
+                    <circle cx="0" cy="0" r="10" fill="#E74C3C" />
+                    <!-- Elma sapı -->
+                    <path d="M 0 -10 Q -5 -15 5 -15" stroke="#5D4037" stroke-width="2" fill="none" />
+                    <!-- Elma yaprağı -->
+                    <path d="M 0 -10 Q 10 -15 10 -5 Q 5 -2 0 -10" fill="#8BC34A" />
+                </g>
+            </g>
+
+
+            <!-- --- ZÜRAFA BÖLÜMÜ --- -->
+
+            <!-- Arka Bacaklar (Dışta, koyu renkli) -->
+            <rect x="600" y="380" width="20" height="160" fill="#D4AC0D" rx="10" />
+            <rect x="520" y="380" width="20" height="160" fill="#D4AC0D" rx="10" />
+
+            <!-- Gövde Arkası (Kuyruk) -->
+            <g id="tail">
+                <path d="M 660 360 Q 690 380 670 440" fill="none" stroke="#F4D03F" stroke-width="8"
+                    stroke-linecap="round" />
+                <circle cx="670" cy="440" r="10" fill="#8B4513" />
+            </g>
+
+            <!-- Ana Gövde Şekli -->
+            <path d="M 480 390 C 480 300, 670 300, 670 390 C 670 470, 480 470, 480 390 Z" fill="#F4D03F" />
+
+            <!-- Gövde Benekleri -->
+            <circle cx="510" cy="350" r="14" fill="#8B4513" />
+            <circle cx="580" cy="330" r="18" fill="#8B4513" />
+            <circle cx="540" cy="390" r="20" fill="#8B4513" />
+            <circle cx="620" cy="390" r="16" fill="#8B4513" />
+            <circle cx="650" cy="350" r="10" fill="#8B4513" />
+            <circle cx="490" cy="400" r="12" fill="#8B4513" />
+
+            <!-- Ön Bacaklar (Önde, parlak renkli) -->
+            <rect x="620" y="390" width="20" height="160" fill="#F4D03F" rx="10" />
+            <rect x="500" y="390" width="20" height="160" fill="#F4D03F" rx="10" />
+
+            <!-- BOYUN -->
+            <!-- x1 ve y1 gövdedeki sabit başlangıç noktası, x2 ve y2 sürüklenen kafanın pozisyonu olacak! -->
+            <line id="neckBg" x1="490" y1="360" x2="320" y2="240" stroke="#F4D03F" stroke-width="50"
+                stroke-linecap="round" />
+
+            <!-- Boyun Benekleri (Kısa çizgiler "stroke-dasharray" ile benek gibi görünür) -->
+            <line id="neckSpots" x1="490" y1="360" x2="320" y2="240" stroke="#8B4513" stroke-width="15"
+                stroke-dasharray="15, 25" stroke-linecap="round" />
+
+            <!-- KAFA (SÜRÜKLENEBİLİR ELEMAN) -->
+            <g id="head" transform="translate(320, 240)">
+                <!-- Sağ Kulak (Kafanın arkasında kalan kulak) -->
+                <ellipse cx="25" cy="-25" rx="20" ry="10" fill="#D4AC0D" transform="rotate(30, 25, -25)" />
+
+                <!-- Sağ Boynuz (Ossicone) -->
+                <line x1="25" y1="-30" x2="35" y2="-65" stroke="#D4AC0D" stroke-width="8" stroke-linecap="round" />
+                <circle cx="35" cy="-65" r="8" fill="#5C3A21" />
+
+                <!-- Kafa tabanı -->
+                <ellipse cx="5" cy="-10" rx="35" ry="30" fill="#F4D03F" />
+
+                <!-- Buruna giden uzun yüz kısmı -->
+                <path d="M -15 -30 L -55 5 L -35 40 L 15 15 Z" fill="#F4D03F" />
+
+                <!-- Burun / Ağız (Snout) -->
+                <ellipse cx="-45" cy="22" rx="22" ry="18" fill="#F5B7B1" transform="rotate(-30, -45, 22)" />
+
+                <!-- Burun deliği -->
+                <circle cx="-55" cy="22" r="4" fill="#555" />
+
+                <!-- Gülümseme Çizgisi -->
+                <path d="M -60 30 Q -50 40 -35 35" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" />
+
+                <!-- Sol Kulak (Kafanın önündeki kulak) -->
+                <ellipse cx="25" cy="-15" rx="22" ry="10" fill="#F4D03F" transform="rotate(15, 25, -15)" />
+
+                <!-- Sol Boynuz -->
+                <line x1="10" y1="-35" x2="15" y2="-75" stroke="#F4D03F" stroke-width="10" stroke-linecap="round" />
+                <circle cx="15" cy="-75" r="10" fill="#8B4513" />
+
+                <!-- Göz -->
+                <ellipse cx="-15" cy="-10" rx="7" ry="10" fill="white" transform="rotate(-15, -15, -10)" />
+                <circle cx="-16" cy="-10" r="4" fill="#333" />
+                <circle cx="-18" cy="-12" r="2" fill="white" />
+            </g>
+
+        </svg>
+    </div>
+
+    <!-- İNTERAKTİF JAVA SCRIPT KODLARI -->
+    <script>
+        // DOM içindeki dinamik objeleri seçiyoruz
+        const svg = document.getElementById('game-svg');
+        const head = document.getElementById('head');
+        const neckBg = document.getElementById('neckBg');
+        const neckSpots = document.getElementById('neckSpots');
+
+        // Sürükleme durumu takibi
+        let isDragging = false;
+
+        // Fareyi tıkladığımız an ile objenin merkezi arasındaki mesafeyi tutar
+        let startX = 0, startY = 0;
+
+        // Kafa elemanının ekrandaki başlangıç (translate) X ve Y pozisyonu
+        let currentTranslateX = 320;
+        let currentTranslateY = 240;
+
+        // --- Elmaya bakma mantığı değişkenleri ---
+        const appleX = 160;   // Elmanın x konumu (150 ağaç + 10 elma)
+        const appleY = 290;   // Elmanın y konumu (450 ağaç - 160 elma)
+        const baseAngle = 155; // Kafanın orjinal çizimdeki açısı (yaklaşık değer)
+        let previousRotation = null; // Ani açı atlamalarını (spin) önlemek için önceki dönüş açısını saklarız
+
+        function updateHeadTransform() {
+            // Kafadan elmaya doğru olan uzaklık bileşenleri
+            let dx = appleX - currentTranslateX;
+            let dy = appleY - currentTranslateY;
+
+            // Atan2 fonksiyonu radyan döner, onu dereceye çeviriyoruz
+            let targetAngle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+            // Kafanın standart yönelimini çıkartarak uygulanması gereken net rotasyonu (dönüş) buluyoruz
+            let rotation = targetAngle - baseAngle;
+
+            // İlk hesaplamada önceki yön değerini sıfırlıyoruz
+            if (previousRotation === null) {
+                previousRotation = rotation;
+            }
+
+            // CSS "transition" devredeyken -180 ile 180 sınırına ulaşıldığında ani bir etrafında dönme (spin) etkisini yok etmek için:
+            // Hedef yön ile önceki yönümüz arasındaki en kısa diferansiyeli (farkı) hesaplarız.
+            let diff = rotation - previousRotation;
+
+            // Atlamayı engellemek için farkı -180 ile +180 derece aralığına normalize ediyoruz (Mod matematik operasyonu)
+            diff = ((diff + 180) % 360 + 360) % 360 - 180;
+
+            // Kesintisiz pürüzsüz rotasyon akışı için farkı direkt eski açıya ilave ederek atlamayı eziyoruz
+            rotation = previousRotation + diff;
+            previousRotation = rotation;
+
+            // Posizyon ile birlikte rotasyonu uyguluyoruz
+            head.setAttribute('transform', `translate(${currentTranslateX}, ${currentTranslateY}) rotate(${rotation})`);
+        }
+
+        // Başlangıçta da kafayı direk elmaya döndürsün
+        updateHeadTransform();
+
+        // Fareden ve dokunmatik cihazdan gelen olayları dinliyoruz
+        head.addEventListener('mousedown', startDrag);
+        head.addEventListener('touchstart', startDrag, { passive: false });
+
+        // Hareketi ekranın her yerinde yakalamak için window'a dinleyici ekliyoruz
+        window.addEventListener('mousemove', drag);
+        window.addEventListener('touchmove', drag, { passive: false });
+
+        window.addEventListener('mouseup', endDrag);
+        window.addEventListener('touchend', endDrag);
+
+        /**
+         * Farenin ekran (piksel) koordinatlarını SVG içerisindeki 
+         * gerçek koordinat sistemine (viewBox) dönüştüren fonksiyon
+         */
+        function getMousePosition(evt) {
+            let CTM = svg.getScreenCTM();
+            // Eğer dokunmatik bir etkileşim ise ilk parmağın koordinatını al
+            if (evt.touches && evt.touches.length > 0) {
+                evt = evt.touches[0];
+            }
+            return {
+                x: (evt.clientX - CTM.e) / CTM.a,
+                y: (evt.clientY - CTM.f) / CTM.d
+            };
+        }
+
+        /**
+         * Kullanıcı kafaya tıkladığında veya dokunduğunda sürüklemeyi başlatır
+         */
+        function startDrag(evt) {
+            if (evt.type === 'touchstart') {
+                evt.preventDefault(); // Sayfa kaymasını engelle
+            }
+            isDragging = true;
+
+            // Tıkladığımız koordinatı alıyoruz
+            let coord = getMousePosition(evt);
+
+            // Objeyi mouse'un tam da tıkladığımız noktasından tutabilmek için aradaki farkı kaydederiz
+            startX = coord.x - currentTranslateX;
+            startY = coord.y - currentTranslateY;
+        }
+
+        /**
+         * Faremiz sürüklendiği müddetçe çalışıp kafayı ve boynu çizer
+         */
+        function drag(evt) {
+            if (isDragging) {
+                if (evt.type === 'touchmove') {
+                    evt.preventDefault();
+                }
+
+                // Cihazın / farenin anlık SVG pozisyonu
+                let coord = getMousePosition(evt);
+
+                // Objeyi baştan ne kadar saptırdığımızı düşerek güncel X ve Y'yi elde ediyoruz
+                currentTranslateX = coord.x - startX;
+                currentTranslateY = coord.y - startY;
+
+                // 1) Kafanın `transform` değerini ve elmaya doğru bakacağı rotasyonu uygula
+                updateHeadTransform();
+
+                // 2) Kafa hareket ettikçe BOYNU ona bağla!
+                // Boynun kafaya bağlandığı noktayı ufak bir offset vererek estetik olarak ortalıyoruz.
+                const neckTargetX = currentTranslateX + 10;
+                const neckTargetY = currentTranslateY + 5;
+
+                // SVG'de line elementinin (x2, y2) bitiş noktasını yeni değere taşıyoruz
+                // Böylece "uzayan/kısalan" boyun illüzyonumuz sağlanıyor.
+                neckBg.setAttribute('x2', neckTargetX);
+                neckBg.setAttribute('y2', neckTargetY);
+                neckSpots.setAttribute('x2', neckTargetX);
+                neckSpots.setAttribute('y2', neckTargetY);
+            }
+        }
+
+        /**
+         * Sürüklenme bittiğinde / fare tuşu bırakıldığında durumu durdur
+         */
+        function endDrag(evt) {
+            if (isDragging) {
+                isDragging = false;
+            }
+        }
+    </script>
+</body>
+
+</html>
