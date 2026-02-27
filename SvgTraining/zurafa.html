@@ -81,6 +81,7 @@
             z-index: 10;
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
 </head>
 
 <body>
@@ -128,7 +129,7 @@
                 <circle cx="0" cy="-190" r="55" fill="#2ECC71" />
 
                 <!-- Elma -->
-                <g id="apple" transform="translate(10, -160) scale(1.6)">
+                <g id="apple" style="transform: translate(10px, -160px) scale(1.6);">
                     <circle cx="0" cy="0" r="10" fill="#E74C3C" />
                     <!-- Elma sapı -->
                     <path d="M 0 -10 Q -5 -15 5 -15" stroke="#5D4037" stroke-width="2" fill="none" />
@@ -217,6 +218,41 @@
 
     <!-- İNTERAKTİF JAVA SCRIPT KODLARI -->
     <script>
+        // Matter.js modüllerini alıyoruz
+        const Engine = Matter.Engine,
+            Runner = Matter.Runner,
+            Bodies = Matter.Bodies,
+            Composite = Matter.Composite,
+            Body = Matter.Body,
+            Events = Matter.Events;
+
+        // Fizik motorunu kuruyoruz
+        const engine = Engine.create();
+
+        // Zemin oluştur (x, y, genişlik, yükseklik - merkez koordinatları alır)
+        // Bizim yeşil alanımız y=450'den başlıyor ve 150 yüksekliğinde. 
+        // Orta noktası: 450 + 75 = 525.
+        const ground = Bodies.rectangle(400, 525, 800, 150, { isStatic: true });
+
+        // Kafanın başlangıç pozisyonu (Yerde durabilmesi için zemin hizasını baz alıyoruz)
+        let currentTranslateX = 350;
+        let currentTranslateY = 415; // 450 (zemin üstü) - 35 (yarıçap) = 415
+
+        // Zürafa kafası için fiziksel obje
+        // restitution: 0.8 ile yüksekten bırakıldığında eğlenceli şekilde zıplar
+        const headBody = Bodies.circle(currentTranslateX, currentTranslateY, 35, {
+            restitution: 0.8, // Zıplama payı
+            friction: 0.05,
+            mass: 1
+        });
+
+        // Dünyaya objeleri ekliyoruz
+        Composite.add(engine.world, [ground, headBody]);
+
+        // Simülasyonu başlatıyoruz
+        const runner = Runner.create();
+        Runner.run(runner, engine);
+
         // DOM içindeki dinamik objeleri seçiyoruz
         const svg = document.getElementById('game-svg');
         const head = document.getElementById('head');
@@ -225,72 +261,71 @@
 
         // Sürükleme durumu takibi
         let isDragging = false;
-
-        // Fareyi tıkladığımız an ile objenin merkezi arasındaki mesafeyi tutar
         let startX = 0, startY = 0;
 
-        // Kafa elemanının ekrandaki başlangıç (translate) X ve Y pozisyonu
-        let currentTranslateX = 320;
-        let currentTranslateY = 240;
-
         // --- Elmaya bakma mantığı değişkenleri ---
-        const appleX = 160;   // Elmanın x konumu (150 ağaç + 10 elma)
-        const appleY = 290;   // Elmanın y konumu (450 ağaç - 160 elma)
-        const baseAngle = 155; // Kafanın orjinal çizimdeki açısı (yaklaşık değer)
-        let previousRotation = null; // Ani açı atlamalarını (spin) önlemek için önceki dönüş açısını saklarız
+        let appleX = 160;
+        let appleY = 290;
+        let currentLocalX = 10;
+        let currentLocalY = -160;
+        let isEating = false;
+        const baseAngle = 155;
+        let previousRotation = null;
 
         function updateHeadTransform() {
-            // Kafadan elmaya doğru olan uzaklık bileşenleri
             let dx = appleX - currentTranslateX;
             let dy = appleY - currentTranslateY;
-
-            // Atan2 fonksiyonu radyan döner, onu dereceye çeviriyoruz
             let targetAngle = Math.atan2(dy, dx) * 180 / Math.PI;
-
-            // Kafanın standart yönelimini çıkartarak uygulanması gereken net rotasyonu (dönüş) buluyoruz
             let rotation = targetAngle - baseAngle;
 
-            // İlk hesaplamada önceki yön değerini sıfırlıyoruz
             if (previousRotation === null) {
                 previousRotation = rotation;
             }
 
-            // CSS "transition" devredeyken -180 ile 180 sınırına ulaşıldığında ani bir etrafında dönme (spin) etkisini yok etmek için:
-            // Hedef yön ile önceki yönümüz arasındaki en kısa diferansiyeli (farkı) hesaplarız.
             let diff = rotation - previousRotation;
-
-            // Atlamayı engellemek için farkı -180 ile +180 derece aralığına normalize ediyoruz (Mod matematik operasyonu)
             diff = ((diff + 180) % 360 + 360) % 360 - 180;
-
-            // Kesintisiz pürüzsüz rotasyon akışı için farkı direkt eski açıya ilave ederek atlamayı eziyoruz
             rotation = previousRotation + diff;
             previousRotation = rotation;
 
-            // Posizyon ile birlikte rotasyonu uyguluyoruz
+            // Fiziğe dayalı yeni konuma ve bakış açısına göre SVG'yi güncelle
             head.setAttribute('transform', `translate(${currentTranslateX}, ${currentTranslateY}) rotate(${rotation})`);
         }
 
-        // Başlangıçta da kafayı direk elmaya döndürsün
+        // Başlangıçta render edelim
         updateHeadTransform();
 
-        // Fareden ve dokunmatik cihazdan gelen olayları dinliyoruz
-        head.addEventListener('mousedown', startDrag);
-        head.addEventListener('touchstart', startDrag, { passive: false });
+        function eatApple() {
+            isEating = true;
+            const appleElement = document.getElementById('apple');
 
-        // Hareketi ekranın her yerinde yakalamak için window'a dinleyici ekliyoruz
-        window.addEventListener('mousemove', drag);
-        window.addEventListener('touchmove', drag, { passive: false });
+            appleElement.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+            appleElement.style.opacity = '0';
+            appleElement.style.transform = `translate(${currentLocalX}px, ${currentLocalY}px) scale(0)`;
 
-        window.addEventListener('mouseup', endDrag);
-        window.addEventListener('touchend', endDrag);
+            setTimeout(() => {
+                currentLocalX = Math.floor(Math.random() * 60) - 30;
+                currentLocalY = Math.floor(Math.random() * 50) - 180;
 
-        /**
-         * Farenin ekran (piksel) koordinatlarını SVG içerisindeki 
-         * gerçek koordinat sistemine (viewBox) dönüştüren fonksiyon
-         */
+                appleX = 150 + currentLocalX;
+                appleY = 450 + currentLocalY;
+
+                if (isDragging) updateHeadTransform();
+
+                appleElement.style.transition = 'none';
+                appleElement.style.transform = `translate(${currentLocalX}px, ${currentLocalY}px) scale(0)`;
+
+                setTimeout(() => {
+                    appleElement.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s ease';
+                    appleElement.style.opacity = '1';
+                    appleElement.style.transform = `translate(${currentLocalX}px, ${currentLocalY}px) scale(1.6)`;
+
+                    setTimeout(() => { isEating = false; }, 500);
+                }, 50);
+            }, 300);
+        }
+
         function getMousePosition(evt) {
             let CTM = svg.getScreenCTM();
-            // Eğer dokunmatik bir etkileşim ise ilk parmağın koordinatını al
             if (evt.touches && evt.touches.length > 0) {
                 evt = evt.touches[0];
             }
@@ -300,49 +335,41 @@
             };
         }
 
-        /**
-         * Kullanıcı kafaya tıkladığında veya dokunduğunda sürüklemeyi başlatır
-         */
         function startDrag(evt) {
-            if (evt.type === 'touchstart') {
-                evt.preventDefault(); // Sayfa kaymasını engelle
-            }
+            if (evt.type === 'touchstart') evt.preventDefault();
             isDragging = true;
 
-            // Tıkladığımız koordinatı alıyoruz
-            let coord = getMousePosition(evt);
+            // O objeyi elimizle kontrol ettiğimiz için statik yapıyoruz (yerçekiminden etkilenmesin)
+            Body.setStatic(headBody, true);
 
-            // Objeyi mouse'un tam da tıkladığımız noktasından tutabilmek için aradaki farkı kaydederiz
+            let coord = getMousePosition(evt);
             startX = coord.x - currentTranslateX;
             startY = coord.y - currentTranslateY;
         }
 
-        /**
-         * Faremiz sürüklendiği müddetçe çalışıp kafayı ve boynu çizer
-         */
         function drag(evt) {
             if (isDragging) {
-                if (evt.type === 'touchmove') {
-                    evt.preventDefault();
-                }
+                if (evt.type === 'touchmove') evt.preventDefault();
 
-                // Cihazın / farenin anlık SVG pozisyonu
                 let coord = getMousePosition(evt);
-
-                // Objeyi baştan ne kadar saptırdığımızı düşerek güncel X ve Y'yi elde ediyoruz
                 currentTranslateX = coord.x - startX;
                 currentTranslateY = coord.y - startY;
 
-                // 1) Kafanın `transform` değerini ve elmaya doğru bakacağı rotasyonu uygula
+                // Fiziğe anlık konumu bildir
+                Body.setPosition(headBody, { x: currentTranslateX, y: currentTranslateY });
+                // Elimizden bırakınca eski hızı korumaması için hızını sıfırlıyoruz. Böylece sadece aşağı düşer.
+                Body.setVelocity(headBody, { x: 0, y: 0 });
+                Body.setAngularVelocity(headBody, 0);
+
                 updateHeadTransform();
 
-                // 2) Kafa hareket ettikçe BOYNU ona bağla!
-                // Boynun kafaya bağlandığı noktayı ufak bir offset vererek estetik olarak ortalıyoruz.
+                let dx = currentTranslateX - appleX;
+                let dy = currentTranslateY - appleY;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 50 && !isEating) { eatApple(); }
+
                 const neckTargetX = currentTranslateX + 10;
                 const neckTargetY = currentTranslateY + 5;
-
-                // SVG'de line elementinin (x2, y2) bitiş noktasını yeni değere taşıyoruz
-                // Böylece "uzayan/kısalan" boyun illüzyonumuz sağlanıyor.
                 neckBg.setAttribute('x2', neckTargetX);
                 neckBg.setAttribute('y2', neckTargetY);
                 neckSpots.setAttribute('x2', neckTargetX);
@@ -350,14 +377,46 @@
             }
         }
 
-        /**
-         * Sürüklenme bittiğinde / fare tuşu bırakıldığında durumu durdur
-         */
         function endDrag(evt) {
             if (isDragging) {
                 isDragging = false;
+                // Fareyi bıraktığımızda fizik objesini serbest bırak, yerçekiminden dolayı düşsün
+                Body.setStatic(headBody, false);
             }
         }
+
+        head.addEventListener('mousedown', startDrag);
+        head.addEventListener('touchstart', startDrag, { passive: false });
+        window.addEventListener('mousemove', drag);
+        window.addEventListener('touchmove', drag, { passive: false });
+        window.addEventListener('mouseup', endDrag);
+        window.addEventListener('touchend', endDrag);
+
+        // Fizik motoru çalıştığı her milisaniye burası tetiklenir
+        Events.on(engine, 'afterUpdate', function () {
+            // Sürüklenmiyorken fiziksel objenin pozisyonunu zürafanın kafasına kopyala
+            if (!isDragging) {
+                currentTranslateX = headBody.position.x;
+                currentTranslateY = headBody.position.y;
+
+                updateHeadTransform();
+
+                // Boynu serbest düşen kafaya animasyonlu şekilde yapıştır
+                const neckTargetX = currentTranslateX + 10;
+                const neckTargetY = currentTranslateY + 5;
+                neckBg.setAttribute('x2', neckTargetX);
+                neckBg.setAttribute('y2', neckTargetY);
+                neckSpots.setAttribute('x2', neckTargetX);
+                neckSpots.setAttribute('y2', neckTargetY);
+
+                // Kafa zıplarken kazara elmaya değerse, yine yesin :)
+                let dx = currentTranslateX - appleX;
+                let dy = currentTranslateY - appleY;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 50 && !isEating) { eatApple(); }
+            }
+        });
+
     </script>
 </body>
 
