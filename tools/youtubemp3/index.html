@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube MP3 Dönüştürücü</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fab fa-youtube"></i> YouTube MP3</h1>
+            <p>Ücretsiz ve yüksek kaliteli MP3 dönüştürme</p>
+        </header>
+
+        <main>
+            <form id="download-form" class="form-container">
+                <div class="input-group">
+                    <input type="text" id="youtube-url" placeholder="YouTube video bağlantısını buraya yapıştırın..." required>
+                </div>
+                <button type="submit" id="download-btn">
+                    <span class="btn-text">Dönüştür ve İndir</span>
+                    <i class="btn-icon fa-solid fa-arrow-down"></i>
+                </button>
+            </form>
+
+            <div id="status-container" class="status-container hidden">
+                <p id="status-text">İşlem bekleniyor...</p>
+                <div id="progress-container" class="progress-box hidden">
+                    <div id="progress-bar" class="progress-bar"></div>
+                </div>
+            </div>
+
+            <div id="error-container" class="error-container hidden">
+                <i class="fas fa-exclamation-circle"></i>
+                <p id="error-text"></p>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 YouTube MP3 Dönüştürücü - Headless Sürüm</p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

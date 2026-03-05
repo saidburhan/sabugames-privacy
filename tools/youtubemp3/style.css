@@ -1,0 +1,130 @@
+/* Temel Değişkenler ve Ayarlar */
+:root {
+    --bg-color: #0d1117;
+    --text-primary: #ffffff;
+    --text-secondary: #8b949e;
+    --primary-color: #ff0050;
+    --secondary-color: #00f2fe;
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    --error-color: #ff4b4b;
+    --success-color: #2ea043;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 3rem;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: var(--glass-shadow);
+    text-align: center;
+}
+
+header {
+    margin-bottom: 2.5rem;
+}
+
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--primary-color);
+}
+
+header p {
+    color: var(--text-secondary);
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 1.2rem;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    background: rgba(0, 0, 0, 0.2);
+    color: white;
+    outline: none;
+}
+
+button {
+    padding: 1.2rem;
+    border-radius: 12px;
+    border: none;
+    background: var(--primary-color);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+button:disabled {
+    background: #444;
+    cursor: not-allowed;
+}
+
+.status-container, .error-container {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 12px;
+}
+
+.error-container {
+    background: rgba(255, 75, 75, 0.1);
+    color: var(--error-color);
+}
+
+.progress-box {
+    margin-top: 10px;
+    height: 8px;
+    background: #222;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0;
+    background: var(--secondary-color);
+    transition: 0.3s;
+}
+
+.hidden {
+    display: none;
+}
+
+footer {
+    margin-top: 2rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
