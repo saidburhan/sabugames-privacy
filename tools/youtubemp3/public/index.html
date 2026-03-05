@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube MP3 İndirici Çevrimiçi Araç</title>
+    <meta name="description"
+        content="En hızlı ve %100 gizlilik temelli YouTube MP3 dönüştürme ve ses alma aracı. Şarkı ve ses parçalarınızı indirin.">
+    <!-- Stil Dosyası -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome (İkonlar İçin) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Arkaplan Dinamik Objeleri -->
+    <div class="background-elements">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <!-- Cam Efektli (Glassmorphism) Panel -->
+    <div class="container glass-panel">
+        <header>
+            <h1><i class="fa-brands fa-youtube icon-youtube"></i> YouTube <span class="highlight">MP3</span></h1>
+            <p>Videolarınızı saniyeler içinde yüksek kaliteli MP3'e dönüştürün.</p>
+        </header>
+
+        <main>
+            <!-- Youtube URL Toplayıcı Form -->
+            <form id="download-form" class="input-group">
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-link input-icon"></i>
+                    <input type="url" id="youtube-url" placeholder="https://www.youtube.com/watch?v=..." required>
+                </div>
+                <!-- Dönüştür ve İndir Butonu -->
+                <button type="submit" id="download-btn" class="btn-primary">
+                    <span class="btn-text">Dönüştür ve İndir</span>
+                    <i class="fa-solid fa-arrow-down btn-icon"></i>
+                </button>
+            </form>
+
+            <!-- Başarılı İşlem veya Yükleniyor Durumu Capped -->
+            <div id="status-container" class="status-container hidden">
+                <div class="loader"></div>
+                <p id="status-text">İşleniyor, lütfen bekleyin...</p>
+                <div class="progress-bar-container hidden" id="progress-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+            </div>
+
+            <!-- Hata Yönetimi Alanı -->
+            <div id="error-container" class="error-container hidden">
+                <i class="fa-solid fa-circle-exclamation error-icon"></i>
+                <p id="error-text">Bir hata oluştu.</p>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2026 YouTube MP3 Araçları. Tüm hakları saklıdır.</p>
+        </footer>
+    </div>
+
+    <!-- JavaScript Fonksiyonları -->
+    <script src="script.js"></script>
+</body>
+
+</html>

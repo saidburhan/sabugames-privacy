@@ -21,9 +21,15 @@ let pointerDownPos = { x: 0, y: 0 };
 let currentLevelData = null;
 
 // --- Colors ---
-const COLOR_BASE = 0x22222a;
+const THEME_COLORS = {
+    dark: { cubeBody: 0xcccccc, tileBase: 0x22222a },
+    light: { cubeBody: 0x111115, tileBase: 0xdddddd }
+};
+let COLOR_BASE = THEME_COLORS.dark.tileBase;
+let isLightMode = false;
+
 const COLOR_TOP_PATTERN = 0x4cc9f0; // Blue for Top
-const COLOR_USER_PAINT = 0x4bf0a5; // Green for User
+const COLOR_USER_PAINT = 0x39ff14; // Vibrant Neon Green for User
 const COLOR_WRONG = 0xff4d4d;
 const COLOR_FRAME = 0xffaa00; // Gold/Yellow
 
@@ -162,6 +168,11 @@ function init() {
             });
         }
 
+        const themeBtn = document.getElementById('theme-btn');
+        if (themeBtn) {
+            themeBtn.addEventListener('click', toggleTheme);
+        }
+
     } catch (e) {
         console.error("UI Setup Error:", e);
     }
@@ -216,6 +227,33 @@ function init() {
         console.error("3D Error:", err);
         alert("Oyun başlatılırken bir hata oluştu: " + err.message);
     }
+}
+
+function toggleTheme() {
+    isLightMode = !isLightMode;
+    const theme = isLightMode ? THEME_COLORS.light : THEME_COLORS.dark;
+    COLOR_BASE = theme.tileBase;
+
+    const btn = document.getElementById('theme-btn');
+    if (btn) btn.textContent = isLightMode ? '🌙' : '☀️';
+
+    // Update the big core cube color
+    if (cubeGroup) {
+        cubeGroup.children.forEach(child => {
+            if (child.isMesh && child.material.name === "coreMaterial") {
+                child.material.color.setHex(theme.cubeBody);
+                child.material.needsUpdate = true;
+            }
+        });
+    }
+
+    // Update all unpainted small cubes colors
+    interactables.forEach(tile => {
+        if (!tile.userData.isPainted) {
+            tile.material.color.setHex(COLOR_BASE);
+            tile.material.needsUpdate = true;
+        }
+    });
 }
 
 function updateCameraPosition() {
@@ -278,14 +316,15 @@ function animate() {
 
 // --- Geometry Generation ---
 const FACE_SIZE = 5;
-const TILE_SIZE = 0.9;
+const TILE_SIZE = 0.81; // Eski değer 0.9 idi, 0.9 oranıyla küçültülerek 0.81 yapıldı
 
 function createReflectiveCube() {
     cubeGroup = new THREE.Group();
     scene.add(cubeGroup);
 
     const coreGeo = new THREE.BoxGeometry(4.8, 4.8, 4.8);
-    const coreMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.5 });
+    const coreMat = new THREE.MeshStandardMaterial({ color: THEME_COLORS.dark.cubeBody, roughness: 0.5 });
+    coreMat.name = "coreMaterial";
     const core = new THREE.Mesh(coreGeo, coreMat);
     cubeGroup.add(core);
 
@@ -309,15 +348,15 @@ function createFaceGroup(parent, name, pos, rot) {
 
     for (let r = 0; r < 5; r++) {
         for (let c = 0; c < 5; c++) {
-            const geometry = new THREE.BoxGeometry(TILE_SIZE, TILE_SIZE, 0.2);
+            const geometry = new THREE.BoxGeometry(TILE_SIZE, TILE_SIZE, 0.05); // Daha ince küpler
             const material = new THREE.MeshStandardMaterial({
                 color: COLOR_BASE, roughness: 0.2, metalness: 0.1
             });
             const tile = new THREE.Mesh(geometry, material);
 
-            tile.position.x = (c - 2) * 1.0;
-            tile.position.y = (2 - r) * 1.0;
-            tile.position.z = 0;
+            tile.position.x = (c - 2) * 0.935; // Küpler arası ve ayrıtlara olan boşluk eşitlendi
+            tile.position.y = (2 - r) * 0.935; // Aynı sabit uzaklık mantığı Y ekseninde
+            tile.position.z = -0.075; // Gövdeye tam oturması için z eksenini geriye çektik
             tile.userData = { face: name, r: r, c: c, isPainted: false, isInteractable: true };
 
             if (name === 'top') {
@@ -333,9 +372,9 @@ function createFaceGroup(parent, name, pos, rot) {
 function createTopFrame(parent) {
     const frameGroup = new THREE.Group();
     const thickness = 0.08;
-    const length = 5.1;
-    const offset = 2.5;
-    const elevation = 0.05;
+    const length = 5.0; // Çubuk uzunluğunu kenarlara göre biraz kısalttık
+    const offset = 2.46; // Daha sıkı sarması için 2.5'ten 2.46'ya çektik
+    const elevation = -0.03; // Havada kalmaması için aşağı indirdik
 
     const mat = new THREE.MeshStandardMaterial({
         color: 0xffaa00, roughness: 0.2, metalness: 0.1,
@@ -482,12 +521,17 @@ function toggleTile(tileMesh, forceState = null) {
 function updateTileVisual(tileMesh) {
     const data = tileMesh.userData;
     if (data.isPainted) {
-        const color = (data.face === 'top') ? COLOR_TOP_PATTERN : COLOR_USER_PAINT;
-        tileMesh.material.color.setHex(color);
-        tileMesh.material.emissive.setHex(0x111111);
+        const isUserPaint = data.face !== 'top';
+        const paintColor = isUserPaint ? COLOR_USER_PAINT : COLOR_TOP_PATTERN;
+        const emissiveColor = isUserPaint ? 0x00ff00 : 0x2288cc; // Pure bright green glow
+
+        tileMesh.material.color.setHex(paintColor);
+        tileMesh.material.emissive.setHex(emissiveColor);
+        tileMesh.material.emissiveIntensity = isUserPaint ? 1.0 : 0.6; // Maximize neon intensity
     } else {
         tileMesh.material.color.setHex(COLOR_BASE);
         tileMesh.material.emissive.setHex(0x000000);
+        tileMesh.material.emissiveIntensity = 0;
     }
 }
 
