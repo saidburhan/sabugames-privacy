@@ -24,7 +24,7 @@ form.addEventListener('submit', async (e) => {
     try {
         // Hugging Face Space API adresiniz (SPACE OLUŞTURUNCA BURAYI GÜNCELLEYİN)
         // Örnek: https://kullaniciadi-spacename.hf.space
-        const BACKEND_URL = 'https://saidburhan-youtubev3.hf.space';
+        const BACKEND_URL = 'https://saidburhan-youtubev4.hf.space';
 
         const response = await fetch(`${BACKEND_URL}/download?url=${encodeURIComponent(url)}`);
 
