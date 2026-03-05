@@ -93,7 +93,8 @@ button:disabled {
     cursor: not-allowed;
 }
 
-.status-container, .error-container {
+.status-container,
+.error-container {
     margin-top: 1.5rem;
     padding: 1rem;
     border-radius: 12px;
@@ -123,8 +124,29 @@ button:disabled {
     display: none;
 }
 
-footer {
+.site-footer {
     margin-top: 2rem;
-    font-size: 0.8rem;
+    display: flex;
+    justify-content: center;
+    font-size: 0.85rem;
     color: var(--text-secondary);
+    /* Daha açık, görünür bir gri */
+}
+
+.site-footer p {
+    font-weight: 500;
+}
+
+.creator-link {
+    color: #ff0050;
+    /* logonun ana rengiyle uyumlu yapalım */
+    text-decoration: none;
+    margin-left: 5px;
+    transition: all 0.3s ease;
+    font-weight: 700;
+}
+
+.creator-link:hover {
+    color: var(--secondary-color);
+    text-shadow: 0 0 8px var(--secondary-color);
 }
