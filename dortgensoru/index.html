@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İnteraktif Dörtgen Analizi | Köşegen Hesaplayıcı</title>
+    <!-- Modern Yazı Tipleri -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- Meta Açıklama for SEO -->
+    <meta name="description"
+        content="İnteraktif bir dörtgen oluşturun, köşelerini sürükleyin ve köşegen uzunlukları toplamını anında hesaplayın. Matematiksel analiz aracı.">
+</head>
+
+<body>
+
+    <header class="header">
+        <h1>İnteraktif Dörtgen Analizi</h1>
+        <p>Köşe noktalarını (A, B, C, D) sürükleyerek şekli değiştirin.</p>
+    </header>
+
+    <main class="container">
+        <!-- SVG Canvas for the Quadrilateral -->
+        <svg id="svg-canvas" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet">
+            <!-- Background Grid (Optional) -->
+            <defs>
+                <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1" />
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+
+            <!-- Diagonals -->
+            <line id="diag-ac" class="diag-line" stroke="var(--line-diag)" stroke-width="2" />
+            <line id="diag-bd" class="diag-line" stroke="var(--line-diag)" stroke-width="2" />
+
+            <!-- Quadrilateral Sides -->
+            <path id="quad-path" stroke="var(--line-quad)" stroke-width="3" fill="rgba(99, 102, 241, 0.1)"
+                stroke-linejoin="round" />
+
+            <!-- Edge Labels (Distances) -->
+            <text id="label-ab" class="side-label"></text>
+            <text id="label-bc" class="side-label"></text>
+            <text id="label-cd" class="side-label"></text>
+            <text id="label-da" class="side-label"></text>
+
+            <!-- Handles (Points A, B, C, D) -->
+            <circle id="point-a" class="point-handle" r="8" fill="var(--point-a)" stroke="#fff" stroke-width="2" />
+            <circle id="point-b" class="point-handle" r="8" fill="var(--point-b)" stroke="#fff" stroke-width="2" />
+            <circle id="point-c" class="point-handle" r="8" fill="var(--point-c)" stroke="#fff" stroke-width="2" />
+            <circle id="point-d" class="point-handle" r="8" fill="var(--point-d)" stroke="#fff" stroke-width="2" />
+
+            <!-- Point Labels -->
+            <text id="text-a" class="point-label">A</text>
+            <text id="text-b" class="point-label">B</text>
+            <text id="text-c" class="point-label">C</text>
+            <text id="text-d" class="point-label">D</text>
+        </svg>
+
+        <!-- Stats Control Panel -->
+        <aside class="controls">
+            <h2 style="margin-bottom: 1.5rem; font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem;">
+                <span class="pulse"
+                    style="width: 10px; height: 10px; background: var(--accent); border-radius: 50%; display: inline-block;"></span>
+                Canlı Analiz Verileri
+            </h2>
+
+            <div class="stat-item">
+                <span class="stat-label">Kenar [AB]</span>
+                <span id="val-ab" class="stat-value">0 cm</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Kenar [BC]</span>
+                <span id="val-bc" class="stat-value">0 cm</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Kenar [CD]</span>
+                <span id="val-cd" class="stat-value">0 cm</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Kenar [DA]</span>
+                <span id="val-da" class="stat-value">0 cm</span>
+            </div>
+
+            <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid rgba(255,255,255,0.1);">
+                <div class="stat-item">
+                    <span class="stat-label">Köşegen (AC)</span>
+                    <span id="val-ac" class="stat-value">0 cm</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Köşegen (BD)</span>
+                    <span id="val-bd" class="stat-value">0 cm</span>
+                </div>
+                <div class="stat-item" style="margin-top: 0.5rem;">
+                    <span class="stat-label" style="color: var(--accent); font-weight: 700;">Toplam Köşegen</span>
+                    <span id="val-total" class="stat-value highlight">0 cm</span>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 İnteraktif Matematik Aracı. Yapay Zeka tarafından oluşturuldu.</p>
+    </footer>
+
+    <script src="script.js?v=2"></script>
+</body>
+
+</html>
