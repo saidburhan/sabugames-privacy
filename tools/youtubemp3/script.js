@@ -27,7 +27,7 @@ form.addEventListener('submit', async (e) => {
         // Yerel Sunucu Modu: Kendi bilgisayarınızda çalışırken burayı kullanın.
         // Eğer bir gün sunucu engelini aşarsanız burayı sunucu adresiyle değiştirin.
         // BURAYI GÜNCELLEYİN: npx localtunnel üzerinden aldiginiz 'https://xxxx.loca.lt' linkini buraya yapistirin.
-        const BACKEND_URL = 'https://SaidBurhan.pythonanywhere.com';
+        const BACKEND_URL = 'https://saidburhan.pythonanywhere.com';
 
         const response = await fetch(`${BACKEND_URL}/download?url=${encodeURIComponent(url)}`);
 
