@@ -22,20 +22,16 @@ form.addEventListener('submit', async (e) => {
     startLoading();
 
     try {
-        // Hugging Face Space API adresiniz (SPACE OLUŞTURUNCA BURAYI GÜNCELLEYİN)
-        // Örnek: https://kullaniciadi-spacename.hf.space
-        // Yerel Sunucu Modu: Kendi bilgisayarınızda çalışırken burayı kullanın.
-        // Eğer bir gün sunucu engelini aşarsanız burayı sunucu adresiyle değiştirin.
-        // BURAYI GÜNCELLEYİN: npx localtunnel üzerinden aldiginiz 'https://xxxx.loca.lt' linkini buraya yapistirin.
+        // PythonAnywhere Adresiniz
         const BACKEND_URL = 'https://saidburhan.pythonanywhere.com';
 
         const response = await fetch(`${BACKEND_URL}/download?url=${encodeURIComponent(url)}`);
 
         if (!response.ok) {
-            let errorMsg = 'Bilinmeyen bir hata oluştu.';
+            let errorMsg = 'Sunucu hatası (HTTP ' + response.status + ')';
             try {
                 const errorData = await response.json();
-                if (errorData.detail) errorMsg = errorData.detail;
+                if (errorData.error) errorMsg = errorData.error;
             } catch (e) { }
             throw new Error(errorMsg);
         }
@@ -76,6 +72,7 @@ form.addEventListener('submit', async (e) => {
 
     } catch (err) {
         showError(err.message);
+        console.error("Hata Detayı:", err);
     }
 });
 
