@@ -24,7 +24,10 @@ form.addEventListener('submit', async (e) => {
     try {
         // Hugging Face Space API adresiniz (SPACE OLUŞTURUNCA BURAYI GÜNCELLEYİN)
         // Örnek: https://kullaniciadi-spacename.hf.space
-        const BACKEND_URL = 'https://saidburhan-youtubev4.hf.space';
+        // Yerel Sunucu Modu: Kendi bilgisayarınızda çalışırken burayı kullanın.
+        // Eğer bir gün sunucu engelini aşarsanız burayı sunucu adresiyle değiştirin.
+        // BURAYI GÜNCELLEYİN: npx localtunnel üzerinden aldiginiz 'https://xxxx.loca.lt' linkini buraya yapistirin.
+        const BACKEND_URL = 'https://SaidBurhan.pythonanywhere.com';
 
         const response = await fetch(`${BACKEND_URL}/download?url=${encodeURIComponent(url)}`);
 
