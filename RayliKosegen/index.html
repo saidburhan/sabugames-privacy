@@ -14,50 +14,73 @@
     integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk"
     crossorigin="anonymous"></script>
 
-  <script type="module" crossorigin src="/RayliKosegen/assets/index-BwzdcBjU.js"></script>
-  <link rel="stylesheet" crossorigin href="/RayliKosegen/assets/index-E5SnPZk7.css">
+  <script type="module" crossorigin src="/RayliKosegen/assets/index-DhKtoxzN.js"></script>
+  <link rel="stylesheet" crossorigin href="/RayliKosegen/assets/index-C36hWmUn.css">
 </head>
 
 <body>
-  <div id="info">
-    <h3>Raylı Köşegen</h3>
-    <p>Turkuaz küreleri sürükleyerek kesit alanını değiştirin.</p>
-    <button id="fullscreen-btn" title="Tam Ekran">⛶</button>
-  </div>
-
-  <div id="math-panel">
-    <div class="input-group">
-      <label>Küp Ayrıt Uzunluğu (L):</label>
-      <input type="number" id="cubeSizeInput" value="1" step="0.1" min="0.1">
-    </div>
-
-    <div id="math-accordion-content" class="accordion-content">
-      <div class="result-box">
-        <div class="result-row">
-          <span class="result-label">Ayrıt Uzunlukları:</span>
-          <div id="math-edges"></div>
-        </div>
-        <div class="result-row">
-          <span class="result-label">Üçgen Alanı:</span>
-          <div id="math-area" style="font-size: 1.2em; color: #e74c3c;"></div>
-        </div>
+  <!-- Sidebar Navigation -->
+  <div id="sidebar">
+    <div class="sidebar-header">
+      <h2>Raylı Köşegen</h2>
+      <div class="controls-container">
+        <button id="theme-toggle-btn" title="Temayı Değiştir">🌓</button>
+        <button id="fullscreen-btn" title="Tam Ekran">⛶</button>
+        <button id="label-toggle-btn" title="Etiketleri Göster/Gizle" class="closed">
+          <!-- Open Eye -->
+          <svg class="icon-eye-open" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
+          </svg>
+          <!-- Closed Eye -->
+          <svg class="icon-eye-closed" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-4.01.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46A11.804 11.804 0 0 0 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78 3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z" />
+          </svg>
+        </button>
       </div>
     </div>
-    <div id="math-panel-toggle" title="Göster/Gizle">▼</div>
+    <div class="sidebar-menu">
+      <button id="nav-tanitim" class="sidebar-btn active">
+        Tanıtım
+      </button>
+      <button id="nav-uyg1" class="sidebar-btn">
+        Uygulama 1
+      </button>
+      <button id="nav-uyg2" class="sidebar-btn">
+        Uygulama 2
+      </button>
+      <button id="nav-uyg3" class="sidebar-btn">
+        Uygulama 3
+      </button>
+      <button id="nav-serbest" class="sidebar-btn">
+        Serbest Mod
+      </button>
+    </div>
+
+    <!-- Math Panel inside Sidebar -->
+    <div id="math-panel">
+      <div class="input-group">
+        <label>Küp Ayrıt Uzunluğu (L):</label>
+        <input type="number" id="cubeSizeInput" value="1" step="0.1" min="0.1">
+      </div>
+
+      <div id="math-accordion-content" class="accordion-content">
+        <div class="result-box">
+          <div class="result-row">
+            <span class="result-label">Ayrıt Uzunlukları:</span>
+            <div id="math-edges"></div>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Üçgen Alanı:</span>
+            <div id="math-area" style="font-size: 1.2em; color: #e74c3c;"></div>
+          </div>
+        </div>
+      </div>
+      <div id="math-panel-toggle" title="Göster/Gizle">▼</div>
+    </div>
   </div>
 
-  <div id="label-toggle-btn" title="Etiketleri Göster/Gizle" class="closed">
-    <!-- Open Eye -->
-    <svg class="icon-eye-open" viewBox="0 0 24 24" fill="currentColor">
-      <path
-        d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" />
-    </svg>
-    <!-- Closed Eye -->
-    <svg class="icon-eye-closed" viewBox="0 0 24 24" fill="currentColor">
-      <path
-        d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-4.01.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46A11.804 11.804 0 0 0 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78 3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z" />
-    </svg>
-  </div>
 
   <!-- Soru Paneli -->
   <div id="question-panel">
@@ -86,6 +109,15 @@
         <li>Üçgende uzunluk ve alan bağıntılarının oluşturulması,</li>
         <li>Dik üçgenin özellikleri ve Pisagor teoreminin öğretilmesi,</li>
         <li>Uzay geometrisi ve katı cisimler konularının öğretilmesi aşamalarında kullanılabilir.</li>
+      </ul>
+
+
+      <h2>Kontrol Butonları</h2>
+      <p>Sol menünün üst kısmında yer alan butonlar materyali özelleştirmenize yardımcı olur:</p>
+      <ul>
+        <li><strong>🌓 Tema:</strong> Aydınlık ve karanlık görünümler arasında geçiş yapmanızı sağlar.</li>
+        <li><strong>⛶ Tam Ekran:</strong> Dikkat dağınıklığını önlemek için detayları gizleyerek uygulamayı tam ekrana genişletir.</li>
+        <li><strong>👁️ Etiketleri Gizle/Göster:</strong> Küp üzerindeki hesaplamaları, köşe harflerini ve tüm alanı tamamen gizleyip tekrar geri getirmenize yarar.</li>
       </ul>
 
 
