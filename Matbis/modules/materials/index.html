@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Materyaller</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #0f172a;
+            color: white; 
+            padding: 2.5rem; 
+            margin: 0; 
+        }
+        .header { margin-bottom: 2.5rem; }
+        .header h1 { margin: 0 0 0.5rem 0; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        .header p { color: #cbd5e1; margin: 0; font-size: 0.95rem; }
+        
+        .materials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .material-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .material-card:hover {
+            transform: translateY(-6px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(236, 72, 153, 0.5); /* Materyaller sekmesi (pembe) teması */
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+        }
+
+        .material-icon {
+            background: rgba(236, 72, 153, 0.15);
+            color: #ec4899;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+        }
+
+        .material-title { font-size: 1.15rem; font-weight: 600; margin: 0; }
+        .material-desc { font-size: 0.85rem; color: #cbd5e1; margin: 0; line-height: 1.5; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📚 Materyaller Kütüphanesi</h1>
+        <p>Sisteme yüklenen tüm bağımsız eğitim materyallerine buradan ulaşabilirsiniz.</p>
+    </div>
+
+    <div class="materials-grid">
+        <!-- Kombinatorik (Three.js) materyali için kart -->
+        <a href="Kombinatorik/index.html" class="material-card">
+            <div class="material-icon">🌐</div>
+            <h3 class="material-title">Kombinatorik</h3>
+            <p class="material-desc">Three.js ile geliştirilmiş 3 boyutlu dinamik kombinatorik ders materyalini görüntüleyin ve inceleyin.</p>
+        </a>
+
+        <!-- Örnek başka bir boş materyal -->
+        <a href="#" class="material-card" style="opacity: 0.6; cursor: not-allowed;">
+            <div class="material-icon" style="background: rgba(255,255,255,0.1); color: #fff;">+</div>
+            <h3 class="material-title">Yeni Materyal</h3>
+            <p class="material-desc">İleride buraya başka klasörler eklendiğinde liste uzamaya devam edecek.</p>
+        </a>
+    </div>
+</body>
+</html>
