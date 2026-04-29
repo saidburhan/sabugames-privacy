@@ -187,9 +187,6 @@
 
     <div class="workspace" id="workspace-2d">
         <div class="toolbar">
-            <button class="tool-btn" id="toggle-panel-btn" title="Kayıtlı Çalışmalar"><i data-lucide="library"></i></button>
-            <div style="width: 80%; height: 1px; background: rgba(255,255,255,0.1); margin: 0.5rem 0;"></div>
-            
             <button class="tool-btn active" data-tool="select" title="Seç ve Kaydır"><i data-lucide="mouse-pointer-2"></i></button>
             <button class="tool-btn" data-tool="point" title="Nokta Koy"><i data-lucide="circle-dot"></i></button>
             <button class="tool-btn" data-tool="line" title="Çizgi (Doğru Parçası)"><i data-lucide="minus"></i></button>
@@ -198,24 +195,7 @@
             
             <div style="flex-grow: 1;"></div> 
             
-            <button class="tool-btn" id="import-btn" title="Bilgisayardan JSON Yükle"><i data-lucide="folder-open"></i></button>
-            <button class="tool-btn" id="export-btn" title="Bilgisayara JSON İndir"><i data-lucide="download"></i></button>
-            <button class="tool-btn" id="cloud-save-btn" title="Buluta (Veritabanına) Kaydet" style="color: #10b981;"><i data-lucide="cloud-upload"></i></button>
-            
             <button class="tool-btn" id="clear-btn" title="Tahtayı Temizle" style="color: #ef4444; margin-top: 10px;"><i data-lucide="trash-2"></i></button>
-        </div>
-
-        <div class="projects-panel" id="projects-panel">
-            <div class="panel-header">
-                <h3><i data-lucide="library" style="width: 20px; height: 20px;"></i> Kayıtlı Çalışmalar</h3>
-                <button class="tool-btn" id="close-panel-btn" style="width: 32px; height: 32px;" title="Kapat"><i data-lucide="x"></i></button>
-            </div>
-            <div class="projects-list" id="projects-list">
-                <div class="empty-state">
-                    <i data-lucide="loader-2" class="lucide-spin" style="margin-bottom: 10px; width: 24px; height: 24px;"></i>
-                    <br>Yükleniyor...
-                </div>
-            </div>
         </div>
 
         <div class="canvas-container" id="canvas-wrapper">
@@ -470,9 +450,9 @@
         function draw() { ctx.clearRect(0, 0, width, height); drawGrid(); drawShapes(); }
 
         // ==========================================
-        // JSON DIŞA/İÇE AKTAR VE VERİTABANI SİSTEMİ
+        // JSON DIŞA/İÇE AKTAR VE VERİTABANI FONKSİYONLARI
         // ==========================================
-        document.getElementById('export-btn').addEventListener('click', () => {
+        function exportJson() {
             if (shapes.length === 0) {
                 Toast.fire({ title: 'Boş Tuval', text: 'İndirilecek bir şekil yok!', icon: 'warning' });
                 return;
@@ -482,9 +462,9 @@
             dlAnchorElem.setAttribute("href", dataStr);
             dlAnchorElem.setAttribute("download", "matbis_geometri_projesi.json");
             dlAnchorElem.click();
-        });
+        }
 
-        document.getElementById('import-btn').addEventListener('click', () => {
+        function importJson() {
             const input = document.createElement('input');
             input.type = 'file'; input.accept = '.json';
             input.onchange = e => {
@@ -502,9 +482,9 @@
                 }
             }
             input.click();
-        });
+        }
 
-        document.getElementById('cloud-save-btn').addEventListener('click', () => {
+        function saveToCloud() {
             if (shapes.length === 0) {
                 Toast.fire({ title: 'Boş Tuval', text: 'Buluta kaydetmek için önce bir şeyler çizin!', icon: 'warning' });
                 return;
@@ -526,116 +506,33 @@
                 if (result.isConfirmed) {
                     const projectName = result.value.trim();
                     
-                    document.getElementById('cloud-save-btn').innerHTML = `<i data-lucide="loader-2" class="lucide-spin"></i>`;
-                    lucide.createIcons();
-
                     window.parent.postMessage({ 
                         type: 'SAVE_PROJECT_TO_CLOUD', 
                         payload: { module_id: 'geometry', title: projectName, data: shapes } 
                     }, '*');
-
-                    setTimeout(() => {
-                        document.getElementById('cloud-save-btn').innerHTML = `<i data-lucide="cloud-upload"></i>`;
-                        lucide.createIcons();
-                    }, 1500);
                 }
             });
-        });
-
-        // ==========================================
-        // PANEL VE PROJE YÜKLEME İŞLEMLERİ
-        // ==========================================
-        const projectsPanel = document.getElementById('projects-panel');
-        const projectsList = document.getElementById('projects-list');
-
-        function togglePanel() {
-            projectsPanel.classList.toggle('open');
-            if (projectsPanel.classList.contains('open')) {
-                fetchProjects();
-            }
-            // Panelin açılıp kapanması canvas boyutunu etkiler
-            setTimeout(resize, 300);
         }
 
-        document.getElementById('toggle-panel-btn').addEventListener('click', togglePanel);
-        document.getElementById('close-panel-btn').addEventListener('click', () => {
-            projectsPanel.classList.remove('open');
-            setTimeout(resize, 300);
-        });
 
-        function fetchProjects() {
-            projectsList.innerHTML = `
-                <div class="empty-state">
-                    <i data-lucide="loader-2" class="lucide-spin" style="margin-bottom: 10px; width: 24px; height: 24px;"></i>
-                    <br>Projeler Yükleniyor...
-                </div>`;
-            lucide.createIcons();
-
-            window.parent.postMessage({
-                type: 'FETCH_PROJECTS',
-                payload: { module_id: 'geometry' }
-            }, '*');
-        }
-
-        function renderProjects(projects) {
-            if (!projects || projects.length === 0) {
-                projectsList.innerHTML = `
-                    <div class="empty-state">
-                        <i data-lucide="folder-search" style="margin-bottom: 10px; width: 32px; height: 32px; color: #475569;"></i>
-                        <br>Henüz kayıtlı bir çalışma yok.
-                    </div>`;
-                lucide.createIcons();
-                return;
-            }
-
-            projectsList.innerHTML = '';
-            projects.forEach(project => {
-                const dateObj = new Date(project.created_at);
-                const dateStr = dateObj.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-                
-                const card = document.createElement('div');
-                card.className = 'project-card';
-                card.innerHTML = `
-                    <div class="project-title">${project.title || 'İsimsiz Çalışma'}</div>
-                    <div class="project-info">
-                        <div class="project-author"><i data-lucide="user"></i> ${project.author_name}</div>
-                        <div class="project-date"><i data-lucide="clock"></i> ${dateStr}</div>
-                    </div>
-                `;
-                
-                card.addEventListener('click', () => {
-                    if (project.data && Array.isArray(project.data)) {
-                        shapes = project.data;
-                        draw();
-                        Toast.fire({
-                            title: 'Proje Yüklendi',
-                            text: `'${project.title}' başarıyla tahtaya aktarıldı.`,
-                            icon: 'success',
-                            toast: true,
-                            position: 'bottom-end',
-                            showConfirmButton: false,
-                            timer: 3000
-                        });
-                        // Opsiyonel: Yükledikten sonra paneli kapat
-                        // projectsPanel.classList.remove('open');
-                        // setTimeout(resize, 300);
-                    }
-                });
-                
-                projectsList.appendChild(card);
-            });
-            lucide.createIcons();
-        }
-
-        // Ana pencereden gelen mesajları dinle
         window.addEventListener('message', (event) => {
-            if (event.data && event.data.type === 'PROJECTS_FETCHED') {
-                renderProjects(event.data.payload);
+            if (!event.data) return;
+
+            // Topbar'dan gelen aksiyon mesajları
+            if (event.data.type === 'TOPBAR_EXPORT_JSON') {
+                exportJson();
             }
-            if (event.data && event.data.type === 'PROJECT_SAVED') {
-                // Eğer panel açıksa listeyi yenile
-                if (projectsPanel.classList.contains('open')) {
-                    fetchProjects();
+            if (event.data.type === 'TOPBAR_IMPORT_JSON') {
+                importJson();
+            }
+            if (event.data.type === 'TOPBAR_SAVE_CLOUD') {
+                saveToCloud();
+            }
+
+            if (event.data.type === 'LOAD_PROJECT_DATA') {
+                if (event.data.payload && Array.isArray(event.data.payload)) {
+                    shapes = event.data.payload;
+                    draw();
                 }
             }
         });
