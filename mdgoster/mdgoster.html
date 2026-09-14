@@ -384,14 +384,11 @@
   <header class="sticky top-0 z-30 bg-[#13161c]/95 backdrop-blur-md border-b border-[#232834] px-4 lg:px-8 py-2.5 flex items-center justify-between gap-4">
     <div class="flex items-center gap-3">
       <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
-        <i data-lucide="file-text" class="w-4 h-4 text-white"></i>
+        <i data-lucide="sparkles" class="w-4 h-4 text-white"></i>
       </div>
-      <div>
-        <div class="flex items-center gap-2">
-          <span class="font-bold text-sm tracking-tight text-white dark:text-white">Markdown Antigravity</span>
-          <span class="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-mono border border-purple-500/30">CANLI RAPOR</span>
-        </div>
-        <p id="doc-title-bar" class="text-xs text-slate-400 font-medium truncate max-w-[240px] md:max-w-md">denetim_raporu.md</p>
+      <div class="flex flex-col">
+        <span class="font-extrabold text-sm tracking-tight text-white dark:text-white uppercase tracking-wider">MD CANAVARI</span>
+        <span id="doc-title-bar" class="text-[11px] text-purple-400 font-mono font-medium truncate max-w-[200px] md:max-w-md hidden"></span>
       </div>
     </div>
 
@@ -407,9 +404,9 @@
         <input type="file" id="file-input" accept=".md,.markdown,.txt" class="hidden" />
       </label>
 
-      <button id="paste-btn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#1e232e] hover:bg-[#282f3e] text-slate-200 border border-[#2b3342] transition shadow-sm" title="Panodan Markdown Yapıştır">
-        <i data-lucide="clipboard" class="w-3.5 h-3.5 text-indigo-400"></i>
-        <span class="hidden sm:inline">Metin Yapıştır</span>
+      <button id="clear-btn" class="hidden items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-[#1e232e] hover:bg-red-950/40 text-slate-300 hover:text-red-400 border border-[#2b3342] transition" title="Raporu Temizle / Başa Dön">
+        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+        <span class="hidden md:inline">Temizle</span>
       </button>
 
       <button id="print-btn" class="p-2 text-slate-400 hover:text-slate-100 hover:bg-[#1f2430] rounded-lg transition" title="PDF Kaydet / Yazdır">
@@ -424,27 +421,63 @@
 
   <div class="flex-1 flex overflow-hidden relative">
     
-    <!-- Table of Contents Sidebar (collapsible) -->
-    <aside id="toc-sidebar" class="w-64 border-r border-[#222733] bg-[#12141a] overflow-y-auto hidden md:block transition-all duration-300 z-20 shrink-0">
-      <div class="p-4 border-b border-[#202531] flex items-center justify-between">
+    <!-- Table of Contents Sidebar (Fixed & Independent Scroll) -->
+    <aside id="toc-sidebar" class="w-64 border-r border-[#222733] bg-[#12141a] overflow-y-auto hidden md:flex flex-col transition-all duration-300 z-20 shrink-0 h-full select-none">
+      <div class="p-4 border-b border-[#202531] flex items-center justify-between shrink-0">
         <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
           <i data-lucide="align-left" class="w-3.5 h-3.5 text-purple-400"></i>
           İçindekiler (TOC)
         </span>
         <span id="toc-count" class="text-[10px] bg-[#1d222c] text-slate-400 px-1.5 py-0.5 rounded font-mono">0</span>
       </div>
-      <nav id="toc-links" class="p-3 space-y-1 text-xs text-slate-400">
-        <!-- Dynamically generated TOC links -->
+      <nav id="toc-links" class="p-3 space-y-1 text-xs text-slate-400 flex-1 overflow-y-auto">
+        <div class="py-8 text-center text-slate-600 text-xs italic">
+          Henüz belge yüklenmedi
+        </div>
       </nav>
     </aside>
 
     <!-- Main Content Canvas -->
-    <main class="flex-1 overflow-y-auto px-4 py-8 sm:px-8 lg:px-16" id="scroll-container">
-      <div class="max-w-4xl mx-auto">
-        <!-- Document Card -->
-        <article id="markdown-render" class="markdown-body">
+    <main class="flex-1 overflow-y-auto h-full px-4 py-8 sm:px-8 lg:px-16" id="scroll-container">
+      <div class="max-w-4xl mx-auto h-full flex flex-col justify-center">
+
+        <!-- Centered Empty State / Dropzone -->
+        <div id="empty-state" class="my-auto flex flex-col items-center justify-center text-center p-8 sm:p-12 border-2 border-dashed border-[#2b3344] hover:border-purple-500/60 rounded-3xl bg-[#141720]/70 transition-all duration-300 group">
+          <div class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-purple-950/60 to-indigo-950/40 border border-purple-500/30 flex items-center justify-center mb-6 shadow-xl group-hover:scale-105 transition-transform">
+            <i data-lucide="file-up" class="w-10 h-10 text-purple-400 animate-pulse"></i>
+          </div>
+
+          <h2 class="text-xl sm:text-2xl font-bold text-white mb-2 tracking-tight">Markdown Dosyasını Buraya Sürükleyin</h2>
+          <p class="text-sm text-slate-400 max-w-md mb-8">
+            Herhangi bir <code class="text-purple-300 font-mono">.md</code> rapor dosyasını bırakın ya da aşağıdaki butonları kullanarak yükleyin.
+          </p>
+
+          <div class="flex flex-wrap items-center justify-center gap-3">
+            <label class="cursor-pointer flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-purple-600 hover:bg-purple-500 text-white shadow-lg shadow-purple-600/30 hover:shadow-purple-600/50 transition active:scale-95">
+              <i data-lucide="folder-open" class="w-4 h-4"></i>
+              <span>Dosya Seç (.md)</span>
+              <input type="file" id="hero-file-input" accept=".md,.markdown,.txt" class="hidden" />
+            </label>
+
+            <button id="hero-paste-btn" class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-[#1d222e] hover:bg-[#272e3d] text-slate-200 border border-[#2e3748] transition active:scale-95">
+              <i data-lucide="clipboard-type" class="w-4 h-4 text-indigo-400"></i>
+              <span>Metin Yapıştır</span>
+            </button>
+          </div>
+
+          <div class="mt-8 pt-6 border-t border-[#222836] w-full max-w-xs flex justify-center">
+            <button id="load-sample-btn" class="text-xs text-slate-500 hover:text-purple-400 transition flex items-center gap-1.5">
+              <i data-lucide="file-check" class="w-3.5 h-3.5"></i>
+              <span>Örnek Denetim Raporunu Yükle</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Document Card (Hidden until content is provided) -->
+        <article id="markdown-render" class="markdown-body hidden">
           <!-- Rendered markdown goes here -->
         </article>
+
       </div>
     </main>
   </div>
@@ -689,10 +722,26 @@ graph TD
       gfm: true
     });
 
-    async function renderMarkdownText(mdText, filename = 'denetim_raporu.md') {
+    async function renderMarkdownText(mdText, filename = '') {
       const renderContainer = document.getElementById('markdown-render');
+      const emptyState = document.getElementById('empty-state');
       const titleBar = document.getElementById('doc-title-bar');
-      titleBar.innerText = filename;
+      const clearBtn = document.getElementById('clear-btn');
+
+      if (!mdText || !mdText.trim()) {
+        resetToEmptyState();
+        return;
+      }
+
+      // Update filename display in header
+      if (filename) {
+        titleBar.innerText = filename;
+        titleBar.classList.remove('hidden');
+      } else {
+        titleBar.classList.add('hidden');
+      }
+      clearBtn.classList.remove('hidden');
+      clearBtn.classList.add('flex');
 
       // Protect math formulas ($...$ and $$...$$) from marked formatting
       const mathPlaceholders = [];
@@ -725,6 +774,10 @@ graph TD
 
       renderContainer.innerHTML = parsed;
 
+      // Switch views: hide empty state, show markdown render
+      emptyState.classList.add('hidden');
+      renderContainer.classList.remove('hidden');
+
       // Render Mermaid charts
       try {
         await mermaid.run({
@@ -737,8 +790,32 @@ graph TD
       // Build Table of Contents
       buildTOC();
 
-      // Refresh Lucide icons if any
+      // Scroll smoothly to top
+      document.getElementById('scroll-container').scrollTop = 0;
+
+      // Refresh Lucide icons
       lucide.createIcons();
+    }
+
+    function resetToEmptyState() {
+      const renderContainer = document.getElementById('markdown-render');
+      const emptyState = document.getElementById('empty-state');
+      const titleBar = document.getElementById('doc-title-bar');
+      const clearBtn = document.getElementById('clear-btn');
+      const tocContainer = document.getElementById('toc-links');
+      const tocCount = document.getElementById('toc-count');
+
+      renderContainer.innerHTML = '';
+      renderContainer.classList.add('hidden');
+      emptyState.classList.remove('hidden');
+
+      titleBar.innerText = '';
+      titleBar.classList.add('hidden');
+      clearBtn.classList.add('hidden');
+      clearBtn.classList.remove('flex');
+
+      tocContainer.innerHTML = `<div class="py-8 text-center text-slate-600 text-xs italic">Henüz belge yüklenmedi</div>`;
+      tocCount.innerText = '0';
     }
 
     function buildTOC() {
@@ -762,7 +839,7 @@ graph TD
         const link = document.createElement('a');
         link.href = '#' + id;
         link.textContent = text;
-        link.className = 'block py-1 px-2 rounded hover:bg-[#1d222e] hover:text-white transition truncate';
+        link.className = 'block py-1.5 px-2 rounded hover:bg-[#1d222e] hover:text-white transition truncate';
 
         // Indentation depending on tag
         if (heading.tagName === 'H1') {
@@ -782,42 +859,52 @@ graph TD
       });
     }
 
-    // Initial Render on Page Load
+    // Initial load: start clean and empty
     window.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
-      renderMarkdownText(defaultSampleMarkdown, 'denetim_raporu.md');
       setupDragAndDrop();
       setupEventListeners();
     });
 
     function setupEventListeners() {
-      // File Input change
+      // File Inputs (both header and hero)
       const fileInput = document.getElementById('file-input');
-      fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) handleFile(file);
-      });
+      const heroFileInput = document.getElementById('hero-file-input');
 
-      // Paste Modal
-      const pasteBtn = document.getElementById('paste-btn');
+      const onFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          handleFile(file);
+          e.target.value = ''; // Reset input to allow re-uploading same file
+        }
+      };
+
+      fileInput.addEventListener('change', onFileChange);
+      heroFileInput.addEventListener('change', onFileChange);
+
+      // Paste Modal handlers
+      const heroPasteBtn = document.getElementById('hero-paste-btn');
       const pasteModal = document.getElementById('paste-modal');
       const closeModalBtn = document.getElementById('close-modal-btn');
       const cancelPasteBtn = document.getElementById('cancel-paste-btn');
       const applyMarkdownBtn = document.getElementById('apply-markdown-btn');
       const rawInput = document.getElementById('raw-markdown-input');
       const resetSampleBtn = document.getElementById('reset-sample-btn');
+      const loadSampleBtn = document.getElementById('load-sample-btn');
+      const clearBtn = document.getElementById('clear-btn');
 
-      pasteBtn.addEventListener('click', () => {
+      const showModal = () => {
         pasteModal.classList.remove('hidden');
         pasteModal.classList.add('flex');
         rawInput.focus();
-      });
+      };
 
       const hideModal = () => {
         pasteModal.classList.add('hidden');
         pasteModal.classList.remove('flex');
       };
 
+      heroPasteBtn.addEventListener('click', showModal);
       closeModalBtn.addEventListener('click', hideModal);
       cancelPasteBtn.addEventListener('click', hideModal);
 
@@ -831,6 +918,14 @@ graph TD
 
       resetSampleBtn.addEventListener('click', () => {
         rawInput.value = defaultSampleMarkdown;
+      });
+
+      loadSampleBtn.addEventListener('click', () => {
+        renderMarkdownText(defaultSampleMarkdown, 'denetim_raporu.md');
+      });
+
+      clearBtn.addEventListener('click', () => {
+        resetToEmptyState();
       });
 
       // Print button
