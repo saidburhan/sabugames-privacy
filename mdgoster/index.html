@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Antigravity Rapor & Markdown Görüntüleyici</title>
+  <title>MD CANAVARI</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -67,9 +67,57 @@
     }
 
     /* Base Typography & Antigravity Aesthetic */
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
     body {
       font-family: 'Inter', sans-serif;
       transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    /* Fixed TOC Sidebar styles with smooth horizontal collapse */
+    #toc-sidebar {
+      height: 100%;
+      max-height: 100%;
+      transition: width 0.28s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s ease;
+    }
+
+    #toc-sidebar.is-collapsed {
+      width: 0 !important;
+      min-width: 0 !important;
+      border-right-color: transparent !important;
+    }
+
+    #toc-content-container {
+      width: 16rem;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.2s ease;
+    }
+
+    #toc-sidebar.is-collapsed #toc-content-container {
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
+    #toc-sidebar #toggle-sidebar-btn {
+      top: 50%;
+      right: -13px;
+      transform: translateY(-50%);
+      transition: right 0.28s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s ease, border-radius 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    #toc-sidebar.is-collapsed #toggle-sidebar-btn {
+      right: -25px !important;
+      border-top-left-radius: 0 !important;
+      border-bottom-left-radius: 0 !important;
+      border-left: none !important;
+      box-shadow: 4px 0 14px rgba(0, 0, 0, 0.45);
     }
 
     /* Markdown Specific Styling */
@@ -348,14 +396,16 @@
       body {
         background: white !important;
         color: black !important;
+        height: auto !important;
+        overflow: visible !important;
       }
-      header, #sidebar, #floating-tools {
+      header, #toc-sidebar, #drop-overlay {
         display: none !important;
       }
-      #main-content {
-        margin: 0 !important;
+      #scroll-container {
+        overflow: visible !important;
+        height: auto !important;
         padding: 0 !important;
-        max-width: 100% !important;
       }
       .markdown-body {
         color: #111827 !important;
@@ -371,13 +421,13 @@
     }
   </style>
 </head>
-<body class="bg-[#0f1115] text-[#e2e8f0] min-h-screen flex flex-col selection:bg-purple-500/30 selection:text-purple-200">
+<body class="bg-[#0f1115] text-[#e2e8f0] h-screen overflow-hidden flex flex-col selection:bg-purple-500/30 selection:text-purple-200">
 
   <div id="drop-overlay" class="fixed inset-0 z-50 bg-[#0f1115]/90 border-4 border-dashed border-purple-500/80 backdrop-blur-sm opacity-0 flex flex-col items-center justify-center transition-all duration-200">
     <div class="p-6 bg-[#1a1e27] border border-purple-500/40 rounded-2xl shadow-2xl flex flex-col items-center gap-3">
       <i data-lucide="file-down" class="w-16 h-16 text-purple-400 animate-bounce"></i>
       <span class="text-lg font-semibold text-white">Markdown Dosyasını Bırakın</span>
-      <span class="text-xs text-slate-400">Rapor hemen Antigravity stilinde yüklenecektir</span>
+      <span class="text-xs text-slate-400">Rapor hemen yüklenecektir</span>
     </div>
   </div>
 
@@ -394,15 +444,10 @@
 
     <!-- Actions -->
     <div class="flex items-center gap-1.5 sm:gap-2">
-      <button id="toggle-toc-btn" class="p-2 text-slate-400 hover:text-slate-100 hover:bg-[#1f2430] rounded-lg transition" title="İçindekiler / Başlıklar">
-        <i data-lucide="list-tree" class="w-4 h-4"></i>
-      </button>
-
-      <label class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#1e232e] hover:bg-[#282f3e] text-slate-200 border border-[#2b3342] transition shadow-sm">
+      <button id="open-upload-modal-btn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#1e232e] hover:bg-[#282f3e] text-slate-200 border border-[#2b3342] transition shadow-sm" title="Yeni Belge Yükle">
         <i data-lucide="upload-cloud" class="w-3.5 h-3.5 text-purple-400"></i>
         <span class="hidden sm:inline">Dosya Seç (.md)</span>
-        <input type="file" id="file-input" accept=".md,.markdown,.txt" class="hidden" />
-      </label>
+      </button>
 
       <button id="clear-btn" class="hidden items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-[#1e232e] hover:bg-red-950/40 text-slate-300 hover:text-red-400 border border-[#2b3342] transition" title="Raporu Temizle / Başa Dön">
         <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
@@ -412,34 +457,39 @@
       <button id="print-btn" class="p-2 text-slate-400 hover:text-slate-100 hover:bg-[#1f2430] rounded-lg transition" title="PDF Kaydet / Yazdır">
         <i data-lucide="printer" class="w-4 h-4"></i>
       </button>
-
-      <button id="theme-btn" class="p-2 text-slate-400 hover:text-slate-100 hover:bg-[#1f2430] rounded-lg transition" title="Açık / Koyu Tema">
-        <i data-lucide="sun" id="theme-icon" class="w-4 h-4"></i>
-      </button>
     </div>
   </header>
 
-  <div class="flex-1 flex overflow-hidden relative">
+  <div class="flex-1 flex overflow-hidden min-h-0 relative">
     
-    <!-- Table of Contents Sidebar (Fixed & Independent Scroll) -->
-    <aside id="toc-sidebar" class="w-64 border-r border-[#222733] bg-[#12141a] overflow-y-auto hidden md:flex flex-col transition-all duration-300 z-20 shrink-0 h-full select-none">
-      <div class="p-4 border-b border-[#202531] flex items-center justify-between shrink-0">
-        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-          <i data-lucide="align-left" class="w-3.5 h-3.5 text-purple-400"></i>
-          İçindekiler (TOC)
-        </span>
-        <span id="toc-count" class="text-[10px] bg-[#1d222c] text-slate-400 px-1.5 py-0.5 rounded font-mono">0</span>
-      </div>
-      <nav id="toc-links" class="p-3 space-y-1 text-xs text-slate-400 flex-1 overflow-y-auto">
-        <div class="py-8 text-center text-slate-600 text-xs italic">
-          Henüz belge yüklenmedi
+    <!-- Table of Contents Sidebar (Fixed, Independent Scroll & Collapsible) -->
+    <aside id="toc-sidebar" class="relative w-64 border-r border-[#222733] bg-[#12141a] hidden md:flex flex-col shrink-0 h-full select-none z-20">
+      
+      <!-- Center Toggle Button (Hover & Collapse) -->
+      <button id="toggle-sidebar-btn" class="absolute z-30 w-6 h-10 bg-[#1a1e28] hover:bg-purple-600 border border-[#2b3342] hover:border-purple-400 text-slate-400 hover:text-white rounded-full flex items-center justify-center shadow-lg transition-colors cursor-pointer group" title="Menüyü Gizle / Göster">
+        <i data-lucide="chevron-left" id="toggle-sidebar-icon" class="w-3.5 h-3.5 transition-transform duration-300"></i>
+      </button>
+
+      <!-- Inner Fixed-width Wrapper to prevent text-wrap jitter during collapse animation -->
+      <div id="toc-content-container" class="w-64 h-full flex flex-col overflow-hidden">
+        <div class="p-4 border-b border-[#202531] flex items-center justify-between shrink-0">
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+            <i data-lucide="align-left" class="w-3.5 h-3.5 text-purple-400"></i>
+            İçindekiler (TOC)
+          </span>
+          <span id="toc-count" class="text-[10px] bg-[#1d222c] text-slate-400 px-1.5 py-0.5 rounded font-mono">0</span>
         </div>
-      </nav>
+        <nav id="toc-links" class="p-3 space-y-1 text-xs text-slate-400 flex-1 overflow-y-auto">
+          <div class="py-8 text-center text-slate-600 text-xs italic">
+            Henüz belge yüklenmedi
+          </div>
+        </nav>
+      </div>
     </aside>
 
     <!-- Main Content Canvas -->
-    <main class="flex-1 overflow-y-auto h-full px-4 py-8 sm:px-8 lg:px-16" id="scroll-container">
-      <div class="max-w-4xl mx-auto h-full flex flex-col justify-center">
+    <main class="flex-1 overflow-y-auto h-full px-4 py-8 sm:px-8 lg:px-16 min-h-0" id="scroll-container">
+      <div class="max-w-4xl mx-auto min-h-full flex flex-col justify-center">
 
         <!-- Centered Empty State / Dropzone -->
         <div id="empty-state" class="my-auto flex flex-col items-center justify-center text-center p-8 sm:p-12 border-2 border-dashed border-[#2b3344] hover:border-purple-500/60 rounded-3xl bg-[#141720]/70 transition-all duration-300 group">
@@ -464,13 +514,6 @@
               <span>Metin Yapıştır</span>
             </button>
           </div>
-
-          <div class="mt-8 pt-6 border-t border-[#222836] w-full max-w-xs flex justify-center">
-            <button id="load-sample-btn" class="text-xs text-slate-500 hover:text-purple-400 transition flex items-center gap-1.5">
-              <i data-lucide="file-check" class="w-3.5 h-3.5"></i>
-              <span>Örnek Denetim Raporunu Yükle</span>
-            </button>
-          </div>
         </div>
 
         <!-- Document Card (Hidden until content is provided) -->
@@ -482,32 +525,57 @@
     </main>
   </div>
 
-  <div id="paste-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4">
-    <div class="bg-[#161921] border border-[#2b3342] rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col animate-in fade-in zoom-in duration-200">
-      <div class="px-5 py-4 border-b border-[#232834] flex items-center justify-between">
+  <!-- Unified Upload / Drop & Paste Modal Panel -->
+  <div id="upload-modal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-[#161921] border border-[#2b3342] rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl flex flex-col animate-in fade-in zoom-in duration-200">
+      <div class="px-5 py-3.5 border-b border-[#232834] flex items-center justify-between">
         <div class="flex items-center gap-2">
-          <i data-lucide="edit-3" class="w-4 h-4 text-purple-400"></i>
-          <span class="font-semibold text-sm text-slate-200">Markdown Metnini Yapıştırın</span>
+          <i data-lucide="file-plus-2" class="w-4 h-4 text-purple-400"></i>
+          <span class="font-semibold text-sm text-slate-200">Markdown Belgesi Yükle</span>
         </div>
-        <button id="close-modal-btn" class="p-1 rounded-md text-slate-400 hover:text-white hover:bg-[#202632]">
+        <button id="close-upload-modal-btn" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-[#202632] transition">
           <i data-lucide="x" class="w-4 h-4"></i>
         </button>
       </div>
-      <div class="p-5">
-        <textarea id="raw-markdown-input" rows="12" class="w-full bg-[#0f1115] border border-[#262c38] rounded-xl p-3 text-sm font-mono text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500 transition resize-y" placeholder="# Buraya Markdown metninizi yapıştırın..."></textarea>
-      </div>
-      <div class="px-5 py-3.5 bg-[#12141a] border-t border-[#232834] flex items-center justify-between">
-        <button id="reset-sample-btn" class="text-xs text-purple-400 hover:text-purple-300 font-medium">Varsayılan Raporu Geri Yükle</button>
-        <div class="flex items-center gap-2">
-          <button id="cancel-paste-btn" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:bg-[#202633] transition">İptal</button>
-          <button id="apply-markdown-btn" class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-purple-600 hover:bg-purple-500 text-white transition shadow-lg shadow-purple-600/30">Uygula & Render Et</button>
+
+      <div class="p-6 flex flex-col gap-4">
+        <!-- Dropzone inside modal -->
+        <div id="modal-dropzone" class="flex flex-col items-center justify-center text-center p-8 border-2 border-dashed border-[#2b3344] hover:border-purple-500/70 rounded-2xl bg-[#0f1115]/80 transition-all group">
+          <div class="w-14 h-14 rounded-xl bg-purple-950/50 border border-purple-500/30 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+            <i data-lucide="file-up" class="w-7 h-7 text-purple-400"></i>
+          </div>
+          <p class="text-sm font-semibold text-white mb-1">Markdown Dosyasını Buraya Bırakın</p>
+          <p class="text-xs text-slate-400 mb-4">veya aşağıdaki butonlardan dosya seçin ya da metin yapıştırın</p>
+
+          <div class="flex flex-wrap items-center justify-center gap-2.5">
+            <label class="cursor-pointer flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-purple-600 hover:bg-purple-500 text-white shadow-md shadow-purple-600/30 transition active:scale-95">
+              <i data-lucide="folder-open" class="w-3.5 h-3.5"></i>
+              <span>Dosya Seç (.md)</span>
+              <input type="file" id="modal-file-input" accept=".md,.markdown,.txt" class="hidden" />
+            </label>
+
+            <button id="modal-paste-btn" class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold bg-[#1d222e] hover:bg-[#272e3d] text-slate-200 border border-[#2e3748] transition active:scale-95">
+              <i data-lucide="clipboard-type" class="w-3.5 h-3.5 text-indigo-400"></i>
+              <span>Metin Yapıştır</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Inline Paste Area (Collapsible) -->
+        <div id="modal-paste-area" class="hidden flex-col gap-2 pt-2 border-t border-[#232834]">
+          <span class="text-xs font-medium text-slate-400">Markdown Metnini Yapıştırın:</span>
+          <textarea id="raw-markdown-input" rows="7" class="w-full bg-[#0f1115] border border-[#262c38] rounded-xl p-3 text-xs font-mono text-slate-200 placeholder-slate-600 focus:outline-none focus:border-purple-500 transition resize-y" placeholder="# Buraya Markdown metninizi yapıştırın..."></textarea>
+          <div class="flex justify-end gap-2 mt-1">
+            <button id="cancel-paste-area-btn" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition">Vazgeç</button>
+            <button id="apply-markdown-btn" class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-purple-600 hover:bg-purple-500 text-white transition shadow-sm">Uygula & Göster</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <script>
-    // Embedded sample markdown file from user turn
+    // Embedded sample markdown for reference if needed
     const defaultSampleMarkdown = `# MATBİS Materyal Seti Denetçi Raporu ve Karar Kartı
 
 **Materyal Adı:** Raylı Köşegen (Küp Kesit Alanı)  
@@ -867,61 +935,97 @@ graph TD
     });
 
     function setupEventListeners() {
-      // File Inputs (both header and hero)
-      const fileInput = document.getElementById('file-input');
+      // Inputs & Modal elements
       const heroFileInput = document.getElementById('hero-file-input');
+      const modalFileInput = document.getElementById('modal-file-input');
+      const uploadModal = document.getElementById('upload-modal');
+      const openUploadModalBtn = document.getElementById('open-upload-modal-btn');
+      const closeUploadModalBtn = document.getElementById('close-upload-modal-btn');
+      const heroPasteBtn = document.getElementById('hero-paste-btn');
+      const modalPasteBtn = document.getElementById('modal-paste-btn');
+      const modalPasteArea = document.getElementById('modal-paste-area');
+      const cancelPasteAreaBtn = document.getElementById('cancel-paste-area-btn');
+      const applyMarkdownBtn = document.getElementById('apply-markdown-btn');
+      const rawInput = document.getElementById('raw-markdown-input');
+      const clearBtn = document.getElementById('clear-btn');
+      const modalDropzone = document.getElementById('modal-dropzone');
 
       const onFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
           handleFile(file);
-          e.target.value = ''; // Reset input to allow re-uploading same file
+          e.target.value = '';
+          hideUploadModal();
         }
       };
 
-      fileInput.addEventListener('change', onFileChange);
       heroFileInput.addEventListener('change', onFileChange);
+      modalFileInput.addEventListener('change', onFileChange);
 
-      // Paste Modal handlers
-      const heroPasteBtn = document.getElementById('hero-paste-btn');
-      const pasteModal = document.getElementById('paste-modal');
-      const closeModalBtn = document.getElementById('close-modal-btn');
-      const cancelPasteBtn = document.getElementById('cancel-paste-btn');
-      const applyMarkdownBtn = document.getElementById('apply-markdown-btn');
-      const rawInput = document.getElementById('raw-markdown-input');
-      const resetSampleBtn = document.getElementById('reset-sample-btn');
-      const loadSampleBtn = document.getElementById('load-sample-btn');
-      const clearBtn = document.getElementById('clear-btn');
-
-      const showModal = () => {
-        pasteModal.classList.remove('hidden');
-        pasteModal.classList.add('flex');
-        rawInput.focus();
+      const showUploadModal = (openPasteDirectly = false) => {
+        uploadModal.classList.remove('hidden');
+        uploadModal.classList.add('flex');
+        if (openPasteDirectly) {
+          modalPasteArea.classList.remove('hidden');
+          modalPasteArea.classList.add('flex');
+          rawInput.focus();
+        } else {
+          modalPasteArea.classList.add('hidden');
+          modalPasteArea.classList.remove('flex');
+        }
+        lucide.createIcons();
       };
 
-      const hideModal = () => {
-        pasteModal.classList.add('hidden');
-        pasteModal.classList.remove('flex');
+      const hideUploadModal = () => {
+        uploadModal.classList.add('hidden');
+        uploadModal.classList.remove('flex');
       };
 
-      heroPasteBtn.addEventListener('click', showModal);
-      closeModalBtn.addEventListener('click', hideModal);
-      cancelPasteBtn.addEventListener('click', hideModal);
+      openUploadModalBtn.addEventListener('click', () => showUploadModal(false));
+      closeUploadModalBtn.addEventListener('click', hideUploadModal);
+
+      // Hero paste button opens modal with paste area focused
+      heroPasteBtn.addEventListener('click', () => showUploadModal(true));
+
+      // Modal paste toggle
+      modalPasteBtn.addEventListener('click', () => {
+        modalPasteArea.classList.toggle('hidden');
+        modalPasteArea.classList.toggle('flex');
+        if (!modalPasteArea.classList.contains('hidden')) {
+          rawInput.focus();
+        }
+      });
+
+      cancelPasteAreaBtn.addEventListener('click', () => {
+        modalPasteArea.classList.add('hidden');
+        modalPasteArea.classList.remove('flex');
+      });
 
       applyMarkdownBtn.addEventListener('click', () => {
         const text = rawInput.value.trim();
         if (text) {
           renderMarkdownText(text, 'yapistirilan_belge.md');
-          hideModal();
+          hideUploadModal();
         }
       });
 
-      resetSampleBtn.addEventListener('click', () => {
-        rawInput.value = defaultSampleMarkdown;
+      // Drag & drop support on modal dropzone
+      modalDropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        modalDropzone.classList.add('border-purple-500');
       });
 
-      loadSampleBtn.addEventListener('click', () => {
-        renderMarkdownText(defaultSampleMarkdown, 'denetim_raporu.md');
+      modalDropzone.addEventListener('dragleave', () => {
+        modalDropzone.classList.remove('border-purple-500');
+      });
+
+      modalDropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        modalDropzone.classList.remove('border-purple-500');
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+          handleFile(e.dataTransfer.files[0]);
+          hideUploadModal();
+        }
       });
 
       clearBtn.addEventListener('click', () => {
@@ -933,30 +1037,20 @@ graph TD
         window.print();
       });
 
-      // Sidebar Toggle
-      const tocBtn = document.getElementById('toggle-toc-btn');
-      const sidebar = document.getElementById('toc-sidebar');
-      tocBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('hidden');
-      });
+      // Sidebar Toggle Button logic
+      const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
+      const tocSidebar = document.getElementById('toc-sidebar');
+      const toggleIcon = document.getElementById('toggle-sidebar-icon');
 
-      // Theme Switcher (Dark / Light)
-      const themeBtn = document.getElementById('theme-btn');
-      const themeIcon = document.getElementById('theme-icon');
-      themeBtn.addEventListener('click', () => {
-        const html = document.documentElement;
-        if (html.classList.contains('dark')) {
-          html.classList.remove('dark');
-          html.classList.add('light');
-          document.body.style.backgroundColor = '#f8fafc';
-          themeIcon.setAttribute('data-lucide', 'moon');
+      toggleSidebarBtn.addEventListener('click', () => {
+        const isCollapsed = tocSidebar.classList.toggle('is-collapsed');
+        if (isCollapsed) {
+          toggleIcon.classList.add('rotate-180');
+          toggleSidebarBtn.setAttribute('title', 'İçindekiler Menüsünü Göster');
         } else {
-          html.classList.add('dark');
-          html.classList.remove('light');
-          document.body.style.backgroundColor = '#0f1115';
-          themeIcon.setAttribute('data-lucide', 'sun');
+          toggleIcon.classList.remove('rotate-180');
+          toggleSidebarBtn.setAttribute('title', 'İçindekiler Menüsünü Gizle');
         }
-        lucide.createIcons();
       });
     }
 
