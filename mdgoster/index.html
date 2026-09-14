@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antigravity Rapor & Markdown Görüntüleyici</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              dark: '#0f1115',
+              surface: '#16191f',
+              card: '#1c2029',
+              border: '#2a2f3d',
+              accent: '#8b5cf6',
+              code: '#e5c07b'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'SFMono-Regular', 'Menlo', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Marked.js (Markdown Parser - Pinned v4.3.0 for stable renderer API) -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
+
+  <!-- KaTeX (Math rendering) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+
+  <!-- Mermaid.js (Diagrams) -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2a313d;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3e4758;
+    }
+
+    /* Base Typography & Antigravity Aesthetic */
+    body {
+      font-family: 'Inter', sans-serif;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    /* Markdown Specific Styling */
+    .markdown-body {
+      color: #cbd5e1;
+      font-size: 0.95rem;
+      line-height: 1.65;
+    }
+    .dark .markdown-body {
+      color: #d1d5db;
+    }
+    html:not(.dark) .markdown-body {
+      color: #334155;
+    }
+
+    /* Headings */
+    .markdown-body h1 {
+      font-size: 1.85rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-top: 1rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.5rem;
+      color: #f8fafc;
+      border-bottom: 1px solid #262b36;
+    }
+    html:not(.dark) .markdown-body h1 {
+      color: #0f172a;
+      border-bottom-color: #e2e8f0;
+    }
+
+    .markdown-body h2 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      margin-top: 2.25rem;
+      margin-bottom: 1rem;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    html:not(.dark) .markdown-body h2 {
+      color: #1e293b;
+    }
+
+    .markdown-body h3 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+      color: #e2e8f0;
+    }
+    html:not(.dark) .markdown-body h3 {
+      color: #334155;
+    }
+
+    .markdown-body p {
+      margin-top: 0.6rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .markdown-body hr {
+      border: 0;
+      height: 1px;
+      background: #252b36;
+      margin: 2rem 0;
+    }
+    html:not(.dark) .markdown-body hr {
+      background: #e2e8f0;
+    }
+
+    /* Antigravity Table Styling (Rounded Card View) */
+    .markdown-body .table-wrapper {
+      margin: 1.25rem 0;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #272d38;
+      background: #15181f;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.28);
+    }
+    html:not(.dark) .markdown-body .table-wrapper {
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .markdown-body table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+
+    .markdown-body th {
+      background-color: #1a1e27;
+      color: #e2e8f0;
+      font-weight: 600;
+      padding: 0.85rem 1.15rem;
+      border-bottom: 1px solid #262c37;
+      letter-spacing: 0.01em;
+    }
+    html:not(.dark) .markdown-body th {
+      background-color: #f1f5f9;
+      color: #1e293b;
+      border-bottom: 1px solid #cbd5e1;
+    }
+
+    .markdown-body td {
+      padding: 0.85rem 1.15rem;
+      border-bottom: 1px solid #20252f;
+      color: #cbd5e1;
+      vertical-align: top;
+      line-height: 1.5;
+    }
+    html:not(.dark) .markdown-body td {
+      border-bottom: 1px solid #e2e8f0;
+      color: #334155;
+    }
+
+    .markdown-body tr:last-child td {
+      border-bottom: none;
+    }
+
+    .markdown-body tr:hover td {
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+    html:not(.dark) .markdown-body tr:hover td {
+      background-color: #f8fafc;
+    }
+
+    /* Inline Code (Warm Golden / Amber tone as in IDE) */
+    .markdown-body :not(pre) > code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.84em;
+      background-color: rgba(45, 41, 35, 0.65);
+      color: #f6c177;
+      border: 1px solid rgba(246, 193, 119, 0.2);
+      padding: 0.15rem 0.4rem;
+      border-radius: 5px;
+      font-weight: 500;
+    }
+    html:not(.dark) .markdown-body :not(pre) > code {
+      background-color: #fef3c7;
+      color: #b45309;
+      border-color: #fde68a;
+    }
+
+    /* Preformatted Code Block */
+    .markdown-body pre {
+      background-color: #13161c;
+      border: 1px solid #242934;
+      border-radius: 8px;
+      padding: 1.15rem;
+      overflow-x: auto;
+      margin: 1.2rem 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.86rem;
+      color: #e5c07b;
+    }
+    html:not(.dark) .markdown-body pre {
+      background-color: #f8fafc;
+      border-color: #e2e8f0;
+      color: #334155;
+    }
+
+    /* Callout & Alert Blocks (GitHub style > [!IMPORTANT], > [!NOTE]) */
+    .callout {
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin: 1.3rem 0;
+      position: relative;
+      font-size: 0.92rem;
+    }
+
+    .callout-important {
+      border-left: 3.5px solid #a855f7;
+      background: rgba(168, 85, 247, 0.08);
+      color: #e2e8f0;
+    }
+    html:not(.dark) .callout-important {
+      background: #faf5ff;
+      border-left-color: #9333ea;
+      color: #4c1d95;
+    }
+    .callout-important .callout-title {
+      color: #c084fc;
+      font-weight: 700;
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    html:not(.dark) .callout-important .callout-title {
+      color: #7e22ce;
+    }
+
+    .callout-note {
+      border-left: 3.5px solid #3b82f6;
+      background: rgba(59, 130, 246, 0.08);
+    }
+    .callout-note .callout-title {
+      color: #60a5fa;
+      font-weight: 700;
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .callout-warning {
+      border-left: 3.5px solid #f59e0b;
+      background: rgba(245, 158, 11, 0.08);
+    }
+    .callout-warning .callout-title {
+      color: #fbbf24;
+      font-weight: 700;
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Lists */
+    .markdown-body ul {
+      list-style-type: disc;
+      padding-left: 1.4rem;
+      margin: 0.6rem 0;
+    }
+    .markdown-body ol {
+      list-style-type: decimal;
+      padding-left: 1.4rem;
+      margin: 0.6rem 0;
+    }
+    .markdown-body li {
+      margin-bottom: 0.35rem;
+    }
+
+    /* Links */
+    .markdown-body a {
+      color: #818cf8;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transition: color 0.15s;
+    }
+    .markdown-body a:hover {
+      color: #a5b4fc;
+    }
+
+    /* Mermaid Container */
+    .mermaid-block {
+      background: #14171e;
+      border: 1px solid #232935;
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1.25rem 0;
+      display: flex;
+      justify-content: center;
+    }
+    html:not(.dark) .mermaid-block {
+      background: #f8fafc;
+      border-color: #e2e8f0;
+    }
+
+    /* Drag Overlay */
+    #drop-overlay {
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    /* Print Setup */
+    @media print {
+      body {
+        background: white !important;
+        color: black !important;
+      }
+      header, #sidebar, #floating-tools {
+        display: none !important;
+      }
+      #main-content {
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+      }
+      .markdown-body {
+        color: #111827 !important;
+      }
+      .table-wrapper {
+        border-color: #ccc !important;
+        box-shadow: none !important;
+      }
+      .markdown-body th {
+        background: #eee !important;
+        color: #000 !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-[#0f1115] text-[#e2e8f0] min-h-screen flex flex-col selection:bg-purple-500/30 selection:text-purple-200">
+
+  <div id="drop-overlay" class="fixed inset-0 z-50 bg-[#0f1115]/90 border-4 border-dashed border-purple-500/80 backdrop-blur-sm opacity-0 flex flex-col items-center justify-center transition-all duration-200">
+    <div class="p-6 bg-[#1a1e27] border border-purple-500/40 rounded-2xl shadow-2xl flex flex-col items-center gap-3">
+      <i data-lucide="file-down" class="w-16 h-16 text-purple-400 animate-bounce"></i>
+      <span class="text-lg font-semibold text-white">Markdown Dosyasını Bırakın</span>
+      <span class="text-xs text-slate-400">Rapor hemen Antigravity stilinde yüklenecektir</span>
+    </div>
+  </div>
+
+  <header class="sticky top-0 z-30 bg-[#13161c]/95 backdrop-blur-md border-b border-[#232834] px-4 lg:px-8 py-2.5 flex items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
+        <i data-lucide="file-text" class="w-4 h-4 text-white"></i>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-sm tracking-tight text-white dark:text-white">Markdown Antigravity</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 font-mono border border-purple-500/30">CANLI RAPOR</span>
+        </div>
+        <p id="doc-title-bar" class="text-xs text-slate-400 font-medium truncate max-w-[240px] md:max-w-md">denetim_raporu.md</p>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center gap-1.5 sm:gap-2">
+      <button id="toggle-toc-btn" class="p-2 text-slate-400 hover:text-slate-100 hover:bg-[#1f2430] rounded-lg transition" title="İçindekiler / Başlıklar">
+        <i data-lucide="list-tree" class="w-4 h-4"></i>
+      </button>
+
+      <label class="cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#1e232e] hover:bg-[#282f3e] text-slate-200 border border-[#2b3342] transition shadow-sm">
+        <i data-lucide="upload-cloud" class="w-3.5 h-3.5 text-purple-400"></i>
+        <span class="hidden sm:inline">Dosya Seç (.md)</span>
+        <input type="file" id="file-input" accept=".md,.markdown,.txt" class="hidden" />
+      </label>
+
+      <button id="paste-btn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#1e232e] hover:bg-[#282f3e] text-slate-200 border border-[#2b3342] transition shadow-sm" title="Panodan Markdown Yapıştır">
+        <i data-lucide="clipboard" class="w-3.5 h-3.5 text-indigo-400"></i>
+        <span class="hidden sm:inline">Metin Yapıştır</span>
+      </button>
+
+      <button id="print-btn" class="p-2 text-slate-400 hover:text-slate-100 hover:bg-[#1f2430] rounded-lg transition" title="PDF Kaydet / Yazdır">
+        <i data-lucide="printer" class="w-4 h-4"></i>
+      </button>
+
+      <button id="theme-btn" class="p-2 text-slate-400 hover:text-slate-100 hover:bg-[#1f2430] rounded-lg transition" title="Açık / Koyu Tema">
+        <i data-lucide="sun" id="theme-icon" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="flex-1 flex overflow-hidden relative">
+    
+    <!-- Table of Contents Sidebar (collapsible) -->
+    <aside id="toc-sidebar" class="w-64 border-r border-[#222733] bg-[#12141a] overflow-y-auto hidden md:block transition-all duration-300 z-20 shrink-0">
+      <div class="p-4 border-b border-[#202531] flex items-center justify-between">
+        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+          <i data-lucide="align-left" class="w-3.5 h-3.5 text-purple-400"></i>
+          İçindekiler (TOC)
+        </span>
+        <span id="toc-count" class="text-[10px] bg-[#1d222c] text-slate-400 px-1.5 py-0.5 rounded font-mono">0</span>
+      </div>
+      <nav id="toc-links" class="p-3 space-y-1 text-xs text-slate-400">
+        <!-- Dynamically generated TOC links -->
+      </nav>
+    </aside>
+
+    <!-- Main Content Canvas -->
+    <main class="flex-1 overflow-y-auto px-4 py-8 sm:px-8 lg:px-16" id="scroll-container">
+      <div class="max-w-4xl mx-auto">
+        <!-- Document Card -->
+        <article id="markdown-render" class="markdown-body">
+          <!-- Rendered markdown goes here -->
+        </article>
+      </div>
+    </main>
+  </div>
+
+  <div id="paste-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-[#161921] border border-[#2b3342] rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col animate-in fade-in zoom-in duration-200">
+      <div class="px-5 py-4 border-b border-[#232834] flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i data-lucide="edit-3" class="w-4 h-4 text-purple-400"></i>
+          <span class="font-semibold text-sm text-slate-200">Markdown Metnini Yapıştırın</span>
+        </div>
+        <button id="close-modal-btn" class="p-1 rounded-md text-slate-400 hover:text-white hover:bg-[#202632]">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+      <div class="p-5">
+        <textarea id="raw-markdown-input" rows="12" class="w-full bg-[#0f1115] border border-[#262c38] rounded-xl p-3 text-sm font-mono text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500 transition resize-y" placeholder="# Buraya Markdown metninizi yapıştırın..."></textarea>
+      </div>
+      <div class="px-5 py-3.5 bg-[#12141a] border-t border-[#232834] flex items-center justify-between">
+        <button id="reset-sample-btn" class="text-xs text-purple-400 hover:text-purple-300 font-medium">Varsayılan Raporu Geri Yükle</button>
+        <div class="flex items-center gap-2">
+          <button id="cancel-paste-btn" class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:bg-[#202633] transition">İptal</button>
+          <button id="apply-markdown-btn" class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-purple-600 hover:bg-purple-500 text-white transition shadow-lg shadow-purple-600/30">Uygula & Render Et</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Embedded sample markdown file from user turn
+    const defaultSampleMarkdown = `# MATBİS Materyal Seti Denetçi Raporu ve Karar Kartı
+
+**Materyal Adı:** Raylı Köşegen (Küp Kesit Alanı)  
+**Denetim Standardı:** MATBİS Materyal Seti Üretim ve Denetim Paketi v1.3.4  
+**Tarih:** 14 Eylül 2026  
+**Denetçi Rolü:** Alan ve Teknik Denetçisi  
+**Resmi JSON Çıktısı:** [\`2026-09-14__materyal-html__raylikosegen__denetci__v01.json\`](file:///d:/OGM/OGM_PROJECTS/RayliKosegen/2026-09-14__materyal-html__raylikosegen__denetci__v01.json)
+
+---
+
+## 1. Yönetici Özeti ve Nihai Karar
+
+| Alan | Değerlendirme Sonucu |
+|---|---|
+| **Genel Puan** | **68 / 100** |
+| **Puan Eşiği** | \`60_79\` (İçerik denetime alınabilir ama yapısal düzeltme gerekir) |
+| **Nihai Karar** | ⚠️ **PAKET TAMAMLANMADAN KABUL EDİLEMEZ** (\`paket_tamamlanmadan_kabul_edilemez\`) |
+| **Tavan Kuralı** | **MS-01 / MS-02** (\`manifest.json\` yokluğu) ve **MS-05** (\`?onizleme=1\` vitrin kipi yokluğu) nedeniyle yapısal teknik tavan uygulanmıştır. |
+
+> [!IMPORTANT]
+> **Denetçi Hükmü:**  
+> Materyalin 3D uzamsal canlandırması, etkileşim akışı, adım kilitleme pedagojisi ve analitik alan hesaplamaları (vektörel kesit hesabı ve rasyonel gösterim) **mükemmel** düzeydedir. Ancak MATBİS Materyal Seti teknik sözleşmesi gereğince **\`manifest.json\` bulunmayan ve \`?onizleme=1\` vitrin kipi sunmayan hiçbir materyal doğrudan havuza kabul edilemez.**  
+> Yapısal teknik eksiklikler giderildiğinde materyalin doğrudan **90+ puanla KABUL** düzeyine yükseleceği öngörülmektedir.
+
+---
+
+## 2. Önkoşul Kapıları Değerlendirmesi (MS-01 — MS-13)
+
+| Kod | Kapı Adı | Durum | Kanıt ve Değerlendirme Notu |
+|---|---|:---:|---|
+| **MS-01** | Paket Bütünlüğü | ❌ Kaldı | Kök dizinde \`index.html\` mevcuttur; ancak \`manifest.json\` bulunmamaktadır. |
+| **MS-02** | Manifest Blokları | ❌ Kaldı | \`manifest.json\` olmadığı için \`kimlik\`, \`matematik\`, \`teknik\` ve \`program\` blokları tanımlanmamıştır. |
+| **MS-03** | Öğrenme Dili | ❌ Kaldı | Manifest program bloğu eksik olduğundan resmi TYMM öğrenme çıktısı, beceri ve süreç etiketleri beyan edilmemiştir. |
+| **MS-04** | Referans & Amaç Beyanı | ⚠️ Kısmi | Arayüzde "Nasıl Kullanılır?" rehberi ve pedagojik açıklamalar vardır; ancak resmi manifest beyanı eksiktir. |
+| **MS-05** | Önizleme Kipi (\`?onizleme=1\`) | ❌ Kaldı | URL parametresi \`?onizleme=1\` yakalanmamakta; vitrin için sadeleştirilmiş temsil modu sunulmamaktadır. |
+| **MS-06** | Tema Uyumu | ✅ Geçti | Varsayılan olarak aydınlık tema ile başlamakta; kullanıcı seçimiyle koyu temaya geçiş yapılabilmekte ve kontrast korunmaktadır. |
+| **MS-07** | Responsive / Mobil Akış | ✅ Geçti | Viewport meta etiketi tanımlıdır. 900px altındaki ekranlarda dikey düzen ve dokunmatik manipülasyon akıcı çalışmaktadır. |
+| **MS-08** | Erişilebilirlik & Odak | ⚠️ Kısmi | Düğmelerde \`:focus-visible\` ve klavye sekme erişimi mevcuttur; ancak 3D sahnedeki hareketli tutamaçlar ok tuşlarıyla kaydırılamamaktadır. |
+| **MS-09** | Etkileşim Alternatifi | ⚠️ Kısmi | Tutamaç hem fare hem dokunmatik (touch) olaylarını desteklemektedir; ancak klavye alternatifi henüz eksiktir. |
+| **MS-10** | Hareket Azaltma | ❌ Kaldı | CSS içinde \`@media (prefers-reduced-motion: reduce)\` kuralı bulunmamakta; otomatik telefon döndürme animasyonu durdurulmamaktadır. |
+| **MS-11** | SCORM Uyumluluğu | ➖ Uygulanamaz | Materyal Seti hattında SCORM şartı aranmaz; puan kırmaz. |
+| **MS-12** | Dış Bağımlılık & Çevrimdışı | ⚠️ Kısmi | \`index.html\` içinde harici KaTeX CDN ve Google Fonts bağlantıları bulunmaktadır. İnternetsiz kurum ağında formül dizgisi kırılabilir. |
+| **MS-13** | Kütüphane Açılışı & Hata Yakalama | ⚠️ Kısmi | WebGL desteği veya harici kütüphane çökmesi durumunda kullanıcıya görsel fallback/hata mesajı gösterilmemektedir. |
+
+---
+
+## 3. İçerik ve Pedagoji Kapıları (M7)
+
+| Boyut | Durum | Kanıt ve Değerlendirme Notu |
+|---|:---:|---|
+| **Matematiksel Doğruluk** | ✅ Geçti | Küpün cisim köşegeni dik arakesitinin (eşkenar üçgen, altıgen) alan hesabı 3D vektörel çarpım analitiği ile doğrulanmıştır. $t=0$ ve $t=1$ uç sınırlarında sıfır alan hesabı kusursuzdur. |
+| **Pedagojik Uygunluk** | ✅ Geçti | Adım 1 (Keşif) $\\rightarrow$ Adım 2 (Alan Hesabı ve Tahmin) $\\rightarrow$ Adım 3 (Grafik Analizi) kilitli akışı öğrencinin rastgele geçiş yapmasını önlemekte, yapı iskelesi (scaffolding) kurmaktadır. |
+| **Etkileşimin Anlamı** | ✅ Geçti | Tutamaç kaydırıldığında arakesit düzlemi, köşe koordinatları ve alan değeri anında dinamik değişmektedir. Etkileşim dekoratif değil, öğrenme eylemidir. |
+| **İşlevsel Bütünlük** | ✅ Geçti | Arayüz butonları, kilit kontrolleri, sıfırlama, tema geçişleri ve yardım modalı kararlı çalışmaktadır. |
+| **Pedagojik Akış** | ✅ Geçti | **Profil:** \`kesif_manipulasyon\` \\| **Akış Modu:** \`karma\` (Yönlendirilmiş görevler tamamlandıktan sonra serbest keşif açılmaktadır). |
+| **Dil ve Dizgi** | ✅ Geçti | Terminoloji (cisim köşegeni, dik kesit, eşkenar üçgen vb.) Türkçeye ve öğretim programına uygundur; dil kusuru bulunmamaktadır. |
+
+---
+
+## 4. TYMM Program Eşleşmesi
+
+- **Referans:** TYMM Matematik Öğretim Programı (2026)
+- **Eşleşme Gücü:** \`guclu\`
+- **Hedef Sınıf Düzeyi:** 10. Sınıf (ve 11-12. sınıf analitik/vektör bağlantıları)
+- **Tema:** Geometri (Uzay Geometri ve Katı Cisimler)
+- **Öğrenme Çıktıları:**
+  - \`MAT.10.6.1\`: Prizmalar ve piramitlerin yüzey, arakesit ve alan özelliklerini keşfeder.
+  - \`MAT.10.6.2\`: Katı cisimlerde kesit alanlarını ve uzamsal ilişkileri dinamik modellerle inceler.
+- **Eşleşme Gerekçesi:** Materyal, bir küpün cisim köşegenine dik kesitlerinin düzlem üzerindeki geometrik dönüşümünü ve alan değişimini dinamik manipülasyonla inceleterek uzamsal akıl yürütme becerisini kazandırmaktadır.
+
+---
+
+## 5. Düzeltme Eylem Planı (Öncelik Sıralaması)
+
+\`\`\`mermaid
+graph TD
+    A[M2: manifest.json Oluşturma] --> B[M3: ?onizleme=1 Vitrin Kipi]
+    B --> C[M1: KaTeX Yerel Paketleme & Çevrimdışı]
+    C --> D[M5: prefers-reduced-motion Desteği]
+    D --> E[M4: 3D Tutamaç Klavye Erişimi]
+    E --> F[MS-13: WebGL Hata Fallback Katmanı]
+    F --> G[Nihai Onay: 95+ Puan KABUL]
+\`\`\`
+
+1. **Öncelik 1 (Kritik / Yapısal — M2 / MS-01, MS-02):**  
+   Kök dizine \`kimlik\`, \`matematik\`, \`teknik\` ve \`program\` bloklarını içeren standart \`manifest.json\` eklenmelidir.
+2. **Öncelik 2 (Kritik / Yapısal — M3 / MS-05):**  
+   \`?onizleme=1\` URL parametresi algılandığında tam kontrol panelini gizleyen, sadece küpü ve temsili arakesiti gösteren vitrin kipi eklenmelidir.
+3. **Öncelik 3 (Önemli / Yerellik — M1 / MS-12):**  
+   \`index.html\` içindeki harici KaTeX CDN ve Google Fonts bağlantıları yerel npm paketinden çekilerek tam çevrimdışı bağımsızlık sağlanmalıdır.
+4. **Öncelik 4 (Küçük Düzeltme — M5 / MS-10):**  
+   \`style.css\` dosyasına \`@media (prefers-reduced-motion: reduce)\` kuralı eklenerek otomatik animasyonlar durdurulmalıdır.
+5. **Öncelik 5 (Erişilebilirlik — M4 / MS-08):**  
+   3D uzaydaki küre tutamaç (handle) klavye odağı (\`tabIndex\`) ve ok tuşları (\`ArrowLeft\`/\`ArrowRight\`) ile hareket ettirilebilir hale getirilmelidir.
+`;
+
+    // Configure Mermaid
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'dark',
+      themeVariables: {
+        darkMode: true,
+        primaryColor: '#8b5cf6',
+        primaryTextColor: '#f8fafc',
+        primaryBorderColor: '#a855f7',
+        lineColor: '#94a3b8',
+        secondaryColor: '#1e222d',
+        tertiaryColor: '#161922'
+      }
+    });
+
+    // Custom marked renderer to wrap tables and format callouts with robust type checks
+    const renderer = new marked.Renderer();
+
+    // Wrap tables inside our custom scrollable card container
+    renderer.table = function(header, body) {
+      const h = typeof header === 'string' ? header : (header?.header || '');
+      const b = typeof body === 'string' ? body : (header?.rows || '');
+      return `
+        <div class="table-wrapper">
+          <table>
+            <thead>${h}</thead>
+            <tbody>${b}</tbody>
+          </table>
+        </div>
+      `;
+    };
+
+    // Custom blockquote to handle GitHub/Obsidian style callouts: > [!IMPORTANT]
+    renderer.blockquote = function(tokenOrQuote) {
+      let quote = '';
+      if (typeof tokenOrQuote === 'string') {
+        quote = tokenOrQuote;
+      } else if (tokenOrQuote && typeof tokenOrQuote === 'object') {
+        quote = tokenOrQuote.text || tokenOrQuote.raw || '';
+        if (this.parser && tokenOrQuote.tokens) {
+          try {
+            quote = this.parser.parse(tokenOrQuote.tokens);
+          } catch(e) {
+            quote = tokenOrQuote.text || '';
+          }
+        }
+      }
+
+      // Check for [!IMPORTANT], [!NOTE], [!WARNING], [!TIP]
+      const importantMatch = quote && quote.match(/\[!IMPORTANT\]/i);
+      const noteMatch = quote && quote.match(/\[!NOTE\]/i);
+      const warnMatch = quote && quote.match(/\[!WARNING\]/i);
+
+      if (importantMatch) {
+        const cleaned = quote.replace(/\[!IMPORTANT\](?:\s*<br\s*\/?>)?/i, '').trim();
+        return `
+          <div class="callout callout-important">
+            <div class="callout-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+              IMPORTANT
+            </div>
+            <div>${cleaned}</div>
+          </div>
+        `;
+      }
+
+      if (noteMatch) {
+        const cleaned = quote.replace(/\[!NOTE\](?:\s*<br\s*\/?>)?/i, '').trim();
+        return `
+          <div class="callout callout-note">
+            <div class="callout-title">NOTE</div>
+            <div>${cleaned}</div>
+          </div>
+        `;
+      }
+
+      if (warnMatch) {
+        const cleaned = quote.replace(/\[!WARNING\](?:\s*<br\s*\/?>)?/i, '').trim();
+        return `
+          <div class="callout callout-warning">
+            <div class="callout-title">WARNING</div>
+            <div>${cleaned}</div>
+          </div>
+        `;
+      }
+
+      return `<blockquote>${quote}</blockquote>`;
+    };
+
+    // Code block renderer for Mermaid and standard code
+    renderer.code = function(code, language) {
+      const src = typeof code === 'string' ? code : (code?.text || '');
+      const lang = typeof language === 'string' ? language : (code?.lang || '');
+
+      if (lang === 'mermaid') {
+        const id = 'mermaid-' + Math.random().toString(36).substr(2, 9);
+        return `<div class="mermaid-block"><div class="mermaid" id="${id}">${src}</div></div>`;
+      }
+      return `<pre><code class="language-${lang || 'text'}">${escapeHtml(src)}</code></pre>`;
+    };
+
+    function escapeHtml(text) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return String(text).replace(/[&<>"']/g, m => map[m]);
+    }
+
+    marked.setOptions({
+      renderer: renderer,
+      breaks: true,
+      gfm: true
+    });
+
+    async function renderMarkdownText(mdText, filename = 'denetim_raporu.md') {
+      const renderContainer = document.getElementById('markdown-render');
+      const titleBar = document.getElementById('doc-title-bar');
+      titleBar.innerText = filename;
+
+      // Protect math formulas ($...$ and $$...$$) from marked formatting
+      const mathPlaceholders = [];
+      let sanitizedMd = mdText.replace(/\$\$([\s\S]+?)\$\$/g, (match, expr) => {
+        const ph = `@@MATH_BLOCK_${mathPlaceholders.length}@@`;
+        try {
+          mathPlaceholders.push(katex.renderToString(expr.trim(), { displayMode: true, throwOnError: false }));
+        } catch (e) {
+          mathPlaceholders.push(match);
+        }
+        return ph;
+      });
+
+      sanitizedMd = sanitizedMd.replace(/\$([^\$\n\r]+?)\$/g, (match, expr) => {
+        const ph = `@@MATH_INLINE_${mathPlaceholders.length}@@`;
+        try {
+          mathPlaceholders.push(katex.renderToString(expr.trim(), { displayMode: false, throwOnError: false }));
+        } catch (e) {
+          mathPlaceholders.push(match);
+        }
+        return ph;
+      });
+
+      let parsed = marked.parse(sanitizedMd);
+
+      // Restore KaTeX rendered HTML formulas
+      parsed = parsed.replace(/@@MATH_(?:BLOCK|INLINE)_(\d+)@@/g, (match, idx) => {
+        return mathPlaceholders[Number(idx)] || match;
+      });
+
+      renderContainer.innerHTML = parsed;
+
+      // Render Mermaid charts
+      try {
+        await mermaid.run({
+          querySelector: '.mermaid'
+        });
+      } catch (err) {
+        console.warn('Mermaid render notice:', err);
+      }
+
+      // Build Table of Contents
+      buildTOC();
+
+      // Refresh Lucide icons if any
+      lucide.createIcons();
+    }
+
+    function buildTOC() {
+      const tocContainer = document.getElementById('toc-links');
+      const tocCount = document.getElementById('toc-count');
+      const headings = document.querySelectorAll('#markdown-render h1, #markdown-render h2, #markdown-render h3');
+
+      tocContainer.innerHTML = '';
+      tocCount.innerText = headings.length;
+
+      if (headings.length === 0) {
+        tocContainer.innerHTML = `<span class="text-slate-500 italic">Başlık bulunamadı</span>`;
+        return;
+      }
+
+      headings.forEach((heading, idx) => {
+        const text = heading.innerText;
+        const id = 'heading-' + idx;
+        heading.id = id;
+
+        const link = document.createElement('a');
+        link.href = '#' + id;
+        link.textContent = text;
+        link.className = 'block py-1 px-2 rounded hover:bg-[#1d222e] hover:text-white transition truncate';
+
+        // Indentation depending on tag
+        if (heading.tagName === 'H1') {
+          link.classList.add('font-semibold', 'text-slate-200');
+        } else if (heading.tagName === 'H2') {
+          link.classList.add('pl-4', 'text-slate-400');
+        } else if (heading.tagName === 'H3') {
+          link.classList.add('pl-7', 'text-slate-500', 'text-[11px]');
+        }
+
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+
+        tocContainer.appendChild(link);
+      });
+    }
+
+    // Initial Render on Page Load
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      renderMarkdownText(defaultSampleMarkdown, 'denetim_raporu.md');
+      setupDragAndDrop();
+      setupEventListeners();
+    });
+
+    function setupEventListeners() {
+      // File Input change
+      const fileInput = document.getElementById('file-input');
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) handleFile(file);
+      });
+
+      // Paste Modal
+      const pasteBtn = document.getElementById('paste-btn');
+      const pasteModal = document.getElementById('paste-modal');
+      const closeModalBtn = document.getElementById('close-modal-btn');
+      const cancelPasteBtn = document.getElementById('cancel-paste-btn');
+      const applyMarkdownBtn = document.getElementById('apply-markdown-btn');
+      const rawInput = document.getElementById('raw-markdown-input');
+      const resetSampleBtn = document.getElementById('reset-sample-btn');
+
+      pasteBtn.addEventListener('click', () => {
+        pasteModal.classList.remove('hidden');
+        pasteModal.classList.add('flex');
+        rawInput.focus();
+      });
+
+      const hideModal = () => {
+        pasteModal.classList.add('hidden');
+        pasteModal.classList.remove('flex');
+      };
+
+      closeModalBtn.addEventListener('click', hideModal);
+      cancelPasteBtn.addEventListener('click', hideModal);
+
+      applyMarkdownBtn.addEventListener('click', () => {
+        const text = rawInput.value.trim();
+        if (text) {
+          renderMarkdownText(text, 'yapistirilan_belge.md');
+          hideModal();
+        }
+      });
+
+      resetSampleBtn.addEventListener('click', () => {
+        rawInput.value = defaultSampleMarkdown;
+      });
+
+      // Print button
+      document.getElementById('print-btn').addEventListener('click', () => {
+        window.print();
+      });
+
+      // Sidebar Toggle
+      const tocBtn = document.getElementById('toggle-toc-btn');
+      const sidebar = document.getElementById('toc-sidebar');
+      tocBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('hidden');
+      });
+
+      // Theme Switcher (Dark / Light)
+      const themeBtn = document.getElementById('theme-btn');
+      const themeIcon = document.getElementById('theme-icon');
+      themeBtn.addEventListener('click', () => {
+        const html = document.documentElement;
+        if (html.classList.contains('dark')) {
+          html.classList.remove('dark');
+          html.classList.add('light');
+          document.body.style.backgroundColor = '#f8fafc';
+          themeIcon.setAttribute('data-lucide', 'moon');
+        } else {
+          html.classList.add('dark');
+          html.classList.remove('light');
+          document.body.style.backgroundColor = '#0f1115';
+          themeIcon.setAttribute('data-lucide', 'sun');
+        }
+        lucide.createIcons();
+      });
+    }
+
+    function setupDragAndDrop() {
+      const overlay = document.getElementById('drop-overlay');
+      let dragCounter = 0;
+
+      window.addEventListener('dragenter', (e) => {
+        e.preventDefault();
+        dragCounter++;
+        overlay.classList.remove('opacity-0');
+        overlay.classList.add('opacity-100');
+      });
+
+      window.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        dragCounter--;
+        if (dragCounter <= 0) {
+          dragCounter = 0;
+          overlay.classList.remove('opacity-100');
+          overlay.classList.add('opacity-0');
+        }
+      });
+
+      window.addEventListener('dragover', (e) => {
+        e.preventDefault();
+      });
+
+      window.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dragCounter = 0;
+        overlay.classList.remove('opacity-100');
+        overlay.classList.add('opacity-0');
+
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+          const file = e.dataTransfer.files[0];
+          handleFile(file);
+        }
+      });
+    }
+
+    function handleFile(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const content = event.target.result;
+        renderMarkdownText(content, file.name);
+      };
+      reader.readAsText(file);
+    }
+  </script>
+</body>
+</html>
