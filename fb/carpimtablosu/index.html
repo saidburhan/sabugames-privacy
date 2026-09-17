@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>PatiMatik - Kedi Temalı Çarpım Tablosu</title>
+
+    <!-- Google Fonts: Fredoka & Quicksand (Modern ve Çocuk Dostu Yuvarlak Tipografi) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Ana modern oyun stilleri -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Arka plan pati deseni -->
+    <div class="bg-paw-pattern"></div>
+
+    <!-- Kutlama konfetisi çizim tuvali -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Ana Uygulama Kartı (Mobil Ekran Boyutunda Sabit ve Asla Taşmayan Düzen) -->
+    <main id="app-container">
+
+        <!-- Üst Bilgi ve Durum Çubuğu -->
+        <header class="header-bar">
+            <!-- Sol: PatiMatik Logo & Başlık (Tıklanınca Ana Menüye Döner) -->
+            <div class="header-brand" id="brand-home-btn" title="Ana Menüye Git">
+                <span class="header-brand-emoji">🐱</span>
+                <span class="header-brand-title">PatiMatik</span>
+            </div>
+            
+            <!-- Sağ: Puan, Kedi Evi ve Ses Kontrolleri -->
+            <div class="top-controls">
+                <!-- Balık Puan Rozeti -->
+                <div class="fish-badge" title="Toplanan Balıklar">
+                    <span>🐟</span>
+                    <span class="fish-count-text">0</span>
+                </div>
+
+                <!-- Kedi Evi Kısayol Butonu -->
+                <button class="icon-btn" id="cat-house-btn" title="Kedi Evi & Rozetler">🏠</button>
+
+                <!-- Fon Müziği Butonu -->
+                <button class="icon-btn" id="music-toggle-btn" title="Müziği Aç / Kapat">🎵</button>
+
+                <!-- Ses Efektleri Butonu -->
+                <button class="icon-btn" id="sound-toggle-btn" title="Ses Efektlerini Aç / Kapat">🔊</button>
+            </div>
+        </header>
+
+        <!-- ======================================================== -->
+        <!-- EKRAN 0: ANA MENÜ (KULLANICININ SEVDİĞİ TATLI KARŞILAMA)  -->
+        <!-- Modlar alta doğru uzamaz; tıklandığında ilgili mod açılır -->
+        <!-- ======================================================== -->
+        <section id="screen-menu" class="screen active">
+            <!-- Seçili Büyük Kedi Avatarı -->
+            <div class="main-cat-stage">
+                <div id="main-cat-avatar" class="main-cat-avatar-box" title="Beni sev! Mırrr...">
+                    <!-- SVG Kedi Çizimi JavaScript tarafından eklenir -->
+                </div>
+                
+                <!-- Seçili Kedinin Seviyesi ve XP Çubuğu (Yalnızca seçili kedininkini gösterir) -->
+                <div class="cat-level-badge-box">
+                    <span id="main-cat-level-badge" class="cat-level-badge">⭐ Seviye 1 - Minik Yavru 🐾</span>
+                    <div class="xp-bar-container">
+                        <div id="main-cat-xp-fill" class="xp-bar-fill" style="width: 0%;"></div>
+                    </div>
+                    <span id="main-cat-xp-text" class="xp-text">0 / 3 Balık (3 kaldı)</span>
+                </div>
+            </div>
+
+            <!-- Başlık ve Açıklama -->
+            <div class="menu-intro-text">
+                <h1 class="menu-title">Miyav! Çarpım Tablosu</h1>
+                <p class="menu-subtitle">Soruları çöz, kediciğini besle ve seviyesini yükselt! 🐾</p>
+            </div>
+
+            <!-- Kedicik Arkadaşını Seç Alanı -->
+            <div class="character-select-section">
+                <div class="character-select-title">Kedicik Arkadaşını Seç:</div>
+                <div class="character-select-area">
+                    <div class="cat-select-card selected" data-cat="pamuk">
+                        <div class="cat-card-svg"></div>
+                        <span>Pamuk (Lv.1)</span>
+                    </div>
+                    <div class="cat-select-card" data-cat="tekir">
+                        <div class="cat-card-svg"></div>
+                        <span>Tekir (Lv.1)</span>
+                    </div>
+                    <div class="cat-select-card" data-cat="karamel">
+                        <div class="cat-card-svg"></div>
+                        <span>Karamel (Lv.1)</span>
+                    </div>
+                    <div class="cat-select-card" data-cat="zeytin">
+                        <div class="cat-card-svg"></div>
+                        <span>Zeytin (Lv.1)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3 Büyük Oyun Modu Kartı (Alta uzamaz, direkt o moda götürür) -->
+            <div class="menu-mode-cards">
+                <button class="mode-menu-card" data-action="open-mode" data-mode="classic">
+                    <div class="mode-card-icon" style="background: #e0fbfb; color: #01a3a4;">🐟</div>
+                    <div class="mode-card-info">
+                        <div class="mode-card-title">Balık Avı (Klasik Mod)</div>
+                        <div class="mode-card-desc">3 Can hakkıyla çarpım sorularını bil, seriyi yakala!</div>
+                    </div>
+                    <div class="mode-card-arrow">➡️</div>
+                </button>
+
+                <button class="mode-menu-card" data-action="open-mode" data-mode="practice">
+                    <div class="mode-card-icon" style="background: #ffeef2; color: #ff5e7e;">🐾</div>
+                    <div class="mode-card-info">
+                        <div class="mode-card-title">Pati Okulu (Öğrenme & Alıştırma)</div>
+                        <div class="mode-card-desc">Balık tabaklarıyla ritmik say ve eğlenceli ezberle.</div>
+                    </div>
+                    <div class="mode-card-arrow">➡️</div>
+                </button>
+
+                <button class="mode-menu-card" data-action="open-mode" data-mode="speed">
+                    <div class="mode-card-icon" style="background: #fff6e0; color: #ff9f43;">⚡</div>
+                    <div class="mode-card-info">
+                        <div class="mode-card-title">Hızlı Pati (60 Saniye)</div>
+                        <div class="mode-card-desc">Zamana karşı yarış ve kendi rekorunu kır!</div>
+                    </div>
+                    <div class="mode-card-arrow">➡️</div>
+                </button>
+            </div>
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- EKRAN 1: PATİ OKULU (SÜRÜKLE & BIRAK ÖĞRENME)             -->
+        <!-- ======================================================== -->
+        <section id="screen-practice" class="screen">
+            <!-- Mod Üst Kontrol Çubuğu (Geri Dönüş & Yatay Çipler) -->
+            <div class="mode-header-row">
+                <button class="back-home-btn" data-action="go-menu" title="Ana Menüye Dön">🏠 Ana Menü</button>
+                <div class="table-chips-scroll" id="practice-chips">
+                    <button class="chip-btn active" data-table="all">🌟 Karışık</button>
+                    <button class="chip-btn" data-table="1">1'ler</button>
+                    <button class="chip-btn" data-table="2">2'ler</button>
+                    <button class="chip-btn" data-table="3">3'ler</button>
+                    <button class="chip-btn" data-table="4">4'ler</button>
+                    <button class="chip-btn" data-table="5">5'ler</button>
+                    <button class="chip-btn" data-table="6">6'lar</button>
+                    <button class="chip-btn" data-table="7">7'ler</button>
+                    <button class="chip-btn" data-table="8">8'ler</button>
+                    <button class="chip-btn" data-table="9">9'lar</button>
+                    <button class="chip-btn" data-table="10">10'lar</button>
+                </div>
+            </div>
+
+            <!-- Kedi ve Hedef Bırakma Sahnesi -->
+            <div class="game-stage-card">
+                <div id="practice-cat-container" class="game-cat-container"></div>
+                <div id="practice-question-text" class="question-text">4 × 3 = ?</div>
+                
+                <div>
+                    <span id="practice-speech-bubble" class="speech-bubble">Doğru balık tabağını kaseye sürükle! 🐾</span>
+                </div>
+
+                <!-- Hedef Mama Kasesi -->
+                <div id="practice-bowl-target" class="bowl-drop-zone">
+                    <span class="bowl-icon">🥣</span>
+                    <span class="bowl-text">Tabağı buraya sürükleyip bırak! 🍽️</span>
+                </div>
+
+                <!-- Tebrik Başarı Mesajı -->
+                <div id="practice-answer-box" class="practice-success-msg" style="display:none;"></div>
+            </div>
+
+            <!-- Sürüklenebilir Tabaklar Izgarası -->
+            <div class="plates-section">
+                <div id="practice-plates-container" class="draggable-plates-grid">
+                    <!-- JavaScript tarafından dinamik oluşturulur -->
+                </div>
+            </div>
+
+            <!-- Sıradaki Soru Butonu -->
+            <button id="practice-next-btn" class="btn-primary" style="margin-top: 8px;">
+                ➡️ Sıradaki Soru
+            </button>
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- EKRAN 2: BALIK AVI (KLASİK 3 CANLI MOD)                   -->
+        <!-- ======================================================== -->
+        <section id="screen-game" class="screen">
+            <!-- Mod Üst Kontrol Çubuğu -->
+            <div class="mode-header-row">
+                <button class="back-home-btn" data-action="go-menu" title="Ana Menüye Dön">🏠 Ana Menü</button>
+                <div class="table-chips-scroll" id="classic-chips">
+                    <button class="chip-btn active" data-table="all">🌟 Karışık</button>
+                    <button class="chip-btn" data-table="1">1'ler</button>
+                    <button class="chip-btn" data-table="2">2'ler</button>
+                    <button class="chip-btn" data-table="3">3'ler</button>
+                    <button class="chip-btn" data-table="4">4'ler</button>
+                    <button class="chip-btn" data-table="5">5'ler</button>
+                    <button class="chip-btn" data-table="6">6'lar</button>
+                    <button class="chip-btn" data-table="7">7'ler</button>
+                    <button class="chip-btn" data-table="8">8'ler</button>
+                    <button class="chip-btn" data-table="9">9'lar</button>
+                    <button class="chip-btn" data-table="10">10'lar</button>
+                </div>
+            </div>
+
+            <!-- Skor ve Canlar Çubuğu -->
+            <div class="stage-info-bar">
+                <div id="game-lives" class="lives-box">❤️❤️❤️</div>
+                <div id="game-combo" class="combo-text">🐾 2x Seri!</div>
+                <div id="game-score" class="score-box">Puan: 0</div>
+            </div>
+
+            <!-- Kedi ve Soru Kartı -->
+            <div class="game-stage-card">
+                <div id="game-cat-container" class="game-cat-container"></div>
+                <div id="question-text" class="question-text">6 × 7 = ?</div>
+                <div>
+                    <span id="game-speech-bubble" class="speech-bubble">Pamuk balığı bekliyor! 🐟</span>
+                </div>
+            </div>
+
+            <!-- 4 Seçenekli 3D Dokunsal Butonlar -->
+            <div id="options-grid" class="options-grid">
+                <!-- JavaScript tarafından dinamik oluşturulur -->
+            </div>
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- EKRAN 3: HIZLI PATİ (60 SANİYE ZAMANA KARŞI)              -->
+        <!-- ======================================================== -->
+        <section id="screen-speed" class="screen">
+            <!-- Mod Üst Kontrol Çubuğu -->
+            <div class="mode-header-row">
+                <button class="back-home-btn" data-action="go-menu" title="Ana Menüye Dön">🏠 Ana Menü</button>
+                <div class="table-chips-scroll" id="speed-chips">
+                    <button class="chip-btn active" data-table="all">🌟 Karışık</button>
+                    <button class="chip-btn" data-table="1">1'ler</button>
+                    <button class="chip-btn" data-table="2">2'ler</button>
+                    <button class="chip-btn" data-table="3">3'ler</button>
+                    <button class="chip-btn" data-table="4">4'ler</button>
+                    <button class="chip-btn" data-table="5">5'ler</button>
+                    <button class="chip-btn" data-table="6">6'lar</button>
+                    <button class="chip-btn" data-table="7">7'ler</button>
+                    <button class="chip-btn" data-table="8">8'ler</button>
+                    <button class="chip-btn" data-table="9">9'lar</button>
+                    <button class="chip-btn" data-table="10">10'lar</button>
+                </div>
+            </div>
+
+            <!-- Süre ve Skor Çubuğu -->
+            <div class="stage-info-bar">
+                <div id="speed-timer" class="timer-box">⏱️ 60s</div>
+                <div id="speed-score" class="score-box">Puan: 0</div>
+                <div id="speed-best" class="best-box">Rekor: 0</div>
+            </div>
+
+            <!-- Kedi ve Soru Kartı -->
+            <div class="game-stage-card">
+                <div id="speed-cat-container" class="game-cat-container"></div>
+                <div id="speed-question-text" class="question-text">8 × 9 = ?</div>
+                <div>
+                    <span id="speed-speech-bubble" class="speech-bubble">Hızlı ol, rekoru kır! ⚡</span>
+                </div>
+            </div>
+
+            <!-- 4 Seçenekli Dokunmatik Butonlar -->
+            <div id="speed-options-grid" class="options-grid">
+                <!-- JavaScript tarafından dinamik oluşturulur -->
+            </div>
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- EKRAN 4: KEDİ EVİ & BÜYÜTME & ROZETLER                     -->
+        <!-- ======================================================== -->
+        <section id="screen-cat-house" class="screen">
+            <!-- Mod Üst Kontrol Çubuğu -->
+            <div class="mode-header-row">
+                <button class="back-home-btn" data-action="go-menu" title="Ana Menüye Dön">🏠 Ana Menü</button>
+                <div style="font-weight: 700; color: var(--primary-dark); font-size: 1.05rem;">🐱 Kedi Evi & Bakım</div>
+            </div>
+
+            <!-- Kedi Karakterini Değiştirme Alanı -->
+            <div class="character-select-area" style="margin-top: 6px;">
+                <div class="cat-select-card selected" data-cat="pamuk">
+                    <div class="cat-card-svg"></div>
+                    <span>Pamuk</span>
+                </div>
+                <div class="cat-select-card" data-cat="tekir">
+                    <div class="cat-card-svg"></div>
+                    <span>Tekir</span>
+                </div>
+                <div class="cat-select-card" data-cat="karamel">
+                    <div class="cat-card-svg"></div>
+                    <span>Karamel</span>
+                </div>
+                <div class="cat-select-card" data-cat="zeytin">
+                    <div class="cat-card-svg"></div>
+                    <span>Zeytin</span>
+                </div>
+            </div>
+
+            <!-- Yalnızca Seçili Kedinin Seviyesi ve XP Göstergesi -->
+            <div class="cat-level-badge-box">
+                <span id="house-cat-level-badge" class="cat-level-badge">⭐ Pamuk - Seviye 1</span>
+                <div class="xp-bar-container large">
+                    <div id="house-cat-xp-fill" class="xp-bar-fill" style="width: 0%;"></div>
+                </div>
+                <span id="house-cat-xp-text" class="xp-text">0 / 3 Balık (3 kaldı)</span>
+            </div>
+
+            <!-- Tıklanabilir Sevilme Alanı -->
+            <div id="petting-cat-box" class="petting-cat-box" title="Beni sev! Mırrr..."></div>
+
+            <!-- Yalnızca Seçili Kediye Balık Verme Butonu -->
+            <button id="feed-cat-btn" class="btn-primary" style="background: linear-gradient(135deg, #feca57, #ff9f43); box-shadow: 0 5px 0 #e58e26;">
+                🐟 Kediciğe Balık Ver (+1 XP)
+            </button>
+
+            <!-- Rozetler Listesi -->
+            <div class="badges-scroll-section">
+                <h3 style="font-size: 0.92rem; color: var(--primary-dark); margin-bottom: 6px;">🎖️ Başarı Rozetlerin</h3>
+                <div id="badges-grid" class="badge-grid">
+                    <!-- Rozetler JS tarafından oluşturulur -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- EKRAN 5: OYUN BİTTİ & TEBRİKLER MODALI                   -->
+        <!-- ======================================================== -->
+        <section id="screen-game-over" class="screen">
+            <div style="text-align:center; margin-top: 15px;">
+                <div style="font-size: 3.2rem;">🎉</div>
+                <h2 id="over-title" style="font-size: 1.8rem; color: var(--primary-dark); margin-bottom: 4px;">Tebrikler!</h2>
+                <p style="font-size: 0.92rem; color: var(--text-muted);">Harika bir matematik turu tamamladın!</p>
+            </div>
+
+            <div class="game-stage-card" style="margin: 16px 0; padding: 20px;">
+                <div style="font-size: 0.95rem; color: var(--text-muted);">Kazanılan Puan</div>
+                <div id="over-score" style="font-size: 3.2rem; font-weight: 700; color: #ff5e7e;">0</div>
+                <div id="over-fish" style="font-size: 1.1rem; font-weight: 700; color: #00d2d3; margin: 8px 0;">🐟 Toplam Balık: 0</div>
+                <div id="over-best" style="font-size: 0.88rem; color: #8395a7;">En İyi Skor: 0</div>
+            </div>
+
+            <div style="display: flex; gap: 10px; width: 100%;">
+                <button id="over-play-again-btn" class="btn-primary" style="flex: 1;">
+                    🔄 Yeniden Oyna
+                </button>
+                <button class="btn-primary" data-action="go-menu" style="flex: 1; background: linear-gradient(135deg, #00d2d3, #01a3a4); box-shadow: 0 5px 0 #008485;">
+                    🏠 Ana Menü
+                </button>
+            </div>
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- ALT SABİT GEZİNME ÇUBUĞU (BOTTOM NAVIGATION BAR)         -->
+        <!-- Modlar alta açılmaz; tek dokunuşla tam ekranda geçiş!    -->
+        <!-- ======================================================== -->
+        <nav class="bottom-nav-bar">
+            <button class="nav-item active" data-nav="screen-menu">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Ana Sayfa</span>
+            </button>
+
+            <button class="nav-item" data-nav="screen-practice">
+                <span class="nav-icon">🐾</span>
+                <span class="nav-label">Pati Okulu</span>
+            </button>
+
+            <button class="nav-item" data-nav="screen-game">
+                <span class="nav-icon">🐟</span>
+                <span class="nav-label">Balık Avı</span>
+            </button>
+
+            <button class="nav-item" data-nav="screen-speed">
+                <span class="nav-icon">⚡</span>
+                <span class="nav-label">Hızlı Pati</span>
+            </button>
+
+            <button class="nav-item" data-nav="screen-cat-house">
+                <span class="nav-icon">🐱</span>
+                <span class="nav-label">Kedi Evi</span>
+            </button>
+        </nav>
+
+    </main>
+
+    <!-- Seviye Atlama (Level Up) Kutlama Modalı -->
+    <div id="level-up-modal" class="level-up-modal">
+        <div class="level-up-card">
+            <div class="level-up-icon">🌟</div>
+            <h2 class="level-up-title">SEVİYE ATLADIN!</h2>
+            <div id="level-up-cat-avatar" class="level-up-cat"></div>
+            <div id="level-up-text" class="level-up-msg">Pamuk Seviye 2 oldu!</div>
+            <button id="level-up-close-btn" class="btn-primary" style="margin-top: 15px;">Harika! 🐾</button>
+        </div>
+    </div>
+
+    <!-- Harici Ses ve Efekt Kütüphaneleri -->
+    <script src="libs/howler.min.js"></script>
+    <script src="libs/confetti.min.js"></script>
+
+    <!-- Oyun motoru ve ses scriptleri -->
+    <script src="audio.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
