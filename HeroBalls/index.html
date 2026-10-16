@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>HeroBalls</title>
+  <!-- YouTube Playables SDK (Only loaded when hosted inside YouTube Playables environment) -->
+  <script>
+    if (location.hostname.includes('youtube.com') || location.hostname.includes('usercontent.goog')) {
+      var ytScript = document.createElement('script');
+      ytScript.src = 'https://www.youtube.com/game_api/v1';
+      ytScript.async = true;
+      ytScript.onerror = function () { window.__ytSdkLoadFailed = true; };
+      document.head.appendChild(ytScript);
+    } else {
+      window.__ytSdkLoadFailed = true;
+    }
+  </script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #4f0917;
+      font-family: 'Segoe UI', 'Arial Black', Impact, system-ui, -apple-system, sans-serif;
+      touch-action: none;
+    }
+
+    #game-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 50% 48%, #ff7b29 0%, #c82b24 48%, #4f0917 100%);
+    }
+
+    #webgl-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 1;
+    }
+
+    #ui-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    /* Top HUD */
+    .hud-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 16px 24px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      pointer-events: none;
+      z-index: 8;
+    }
+
+    .star-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 28px;
+      font-weight: 900;
+      color: #ffd700;
+      text-shadow: 0 3px 0 #702900, 0 5px 10px rgba(0,0,0,0.45);
+      letter-spacing: 0.5px;
+      transition: transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .star-badge.pop {
+      transform: scale(1.22);
+    }
+
+    .star-icon {
+      width: 32px;
+      height: 32px;
+      filter: drop-shadow(0 3px 3px rgba(0,0,0,0.45));
+    }
+
+    .wave-counter {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 10px;
+      font-size: 64px;
+      font-weight: 900;
+      color: #ffffff;
+      text-shadow: 0 4px 0 rgba(75, 12, 10, 0.72), 0 8px 20px rgba(0, 0, 0, 0.45);
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+
+    .hud-right-col {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .btn-icon {
+      pointer-events: auto;
+      cursor: pointer;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      border: 3px solid #ffffff;
+      background: linear-gradient(180deg, #ff9d2e 0%, #e04410 100%);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35), inset 0 4px 6px rgba(255, 255, 255, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.12s ease, filter 0.12s ease;
+    }
+
+    .btn-icon:hover {
+      filter: brightness(1.1);
+    }
+
+    .btn-icon:active {
+      transform: scale(0.92);
+    }
+
+    /* Ability Buttons under Pause Button */
+    .ability-hud-list {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      pointer-events: auto;
+    }
+
+    .ability-hud-btn {
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 10px 5px 6px;
+      border-radius: 999px;
+      border: 2.5px solid rgba(255, 255, 255, 0.85);
+      background: linear-gradient(180deg, rgba(84, 20, 15, 0.9) 0%, rgba(42, 8, 6, 0.94) 100%);
+      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.45), inset 0 2px 5px rgba(255, 255, 255, 0.22);
+      color: #ffffff;
+      transition: transform 0.12s ease, filter 0.12s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .ability-hud-btn:hover {
+      filter: brightness(1.1);
+    }
+
+    .ability-hud-btn:active {
+      transform: scale(0.93);
+    }
+
+    .ability-hud-btn.empty {
+      opacity: 0.65;
+    }
+
+    .ability-hud-btn.shake {
+      animation: btnShake 0.3s ease;
+    }
+
+    .ability-hud-btn.active-fire {
+      border-color: #ffae2b;
+      background: linear-gradient(180deg, #ff6a00 0%, #b82200 100%);
+      box-shadow: 0 0 16px rgba(255, 102, 0, 0.85), 0 5px 12px rgba(0, 0, 0, 0.45);
+      animation: abilityActivePulse 0.65s infinite alternate;
+    }
+
+    .ability-hud-btn.active-ghost {
+      border-color: #8afbff;
+      background: linear-gradient(180deg, #17b8db 0%, #09527a 100%);
+      box-shadow: 0 0 16px rgba(76, 242, 255, 0.85), 0 5px 12px rgba(0, 0, 0, 0.45);
+      animation: abilityActivePulse 0.65s infinite alternate;
+    }
+
+    @keyframes abilityActivePulse {
+      from { transform: scale(1); }
+      to { transform: scale(1.07); }
+    }
+
+    .ability-hud-orb {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .ability-hud-orb.fire {
+      background: radial-gradient(circle at 35% 30%, #fff099 0%, #ff6a00 55%, #b81d00 100%);
+      box-shadow: 0 0 8px rgba(255, 94, 0, 0.8);
+    }
+
+    .ability-hud-orb.ghost {
+      background: radial-gradient(circle at 35% 30%, #ffffff 0%, #6ef7ff 55%, #007ca6 100%);
+      box-shadow: 0 0 8px rgba(82, 247, 255, 0.8);
+    }
+
+    .ability-hud-count {
+      font-size: 15px;
+      font-weight: 900;
+      color: #ffd700;
+      text-shadow: 0 2px 0 #4d1800;
+      min-width: 20px;
+      text-align: center;
+    }
+
+    /* Animated Top Special Ball Notification Banner */
+    .special-banner-wrap {
+      position: absolute;
+      top: 78px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      pointer-events: none;
+      z-index: 5;
+      width: max-content;
+      max-width: 92vw;
+    }
+
+    .special-banner-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 16px;
+      border-radius: 999px;
+      border: 2.5px solid #ffffff;
+      font-size: 13px;
+      font-weight: 900;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      white-space: nowrap;
+      animation: specialBannerFloat 0.7s ease-in-out infinite alternate;
+    }
+
+    .special-banner-pill.hidden {
+      display: none;
+    }
+
+    .special-banner-pill.fire {
+      background: linear-gradient(90deg, #ff4500 0%, #ff9900 50%, #ff3300 100%);
+      background-size: 200% 100%;
+      box-shadow: 0 0 20px rgba(255, 90, 0, 0.85), 0 4px 10px rgba(0, 0, 0, 0.45);
+      text-shadow: 0 2px 0 #7a1600;
+      animation: specialBannerFloat 0.65s ease-in-out infinite alternate, shimmerBg 1.8s linear infinite;
+    }
+
+    .special-banner-pill.ghost {
+      background: linear-gradient(90deg, #0088b8 0%, #3be8ff 50%, #0077b5 100%);
+      background-size: 200% 100%;
+      box-shadow: 0 0 20px rgba(70, 240, 255, 0.85), 0 4px 10px rgba(0, 0, 0, 0.45);
+      text-shadow: 0 2px 0 #003852;
+      animation: specialBannerFloat 0.65s ease-in-out infinite alternate, shimmerBg 1.8s linear infinite;
+    }
+
+    @keyframes specialBannerFloat {
+      from { transform: translateY(0) scale(1); }
+      to { transform: translateY(-4px) scale(1.05); }
+    }
+
+    @keyframes shimmerBg {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+
+    /* Fast Forward Button */
+    .btn-fast-forward {
+      pointer-events: auto;
+      cursor: pointer;
+      position: absolute;
+      right: 28px;
+      bottom: 28px;
+      width: 74px;
+      height: 74px;
+      border-radius: 20px;
+      border: 3px solid #ffffff;
+      background: linear-gradient(180deg, #ffae2b 0%, #f25c05 55%, #ffcf40 100%);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), inset 0 4px 8px rgba(255, 255, 255, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+      opacity: 0;
+      transform: scale(0.5);
+      pointer-events: none;
+    }
+
+    .btn-fast-forward.visible {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+    }
+
+    .btn-fast-forward.active-speed {
+      background: linear-gradient(180deg, #ff512f 0%, #dd2476 100%);
+      animation: pulseSpeed 0.6s infinite alternate;
+    }
+
+    @keyframes pulseSpeed {
+      from { transform: scale(1); }
+      to { transform: scale(1.08); }
+    }
+
+    /* Aim Hint Banner */
+    .aim-hint {
+      position: absolute;
+      bottom: 14%;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255, 248, 238, 0.92);
+      font-size: 18px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.6);
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      text-align: center;
+      background: rgba(74, 14, 18, 0.62);
+      padding: 8px 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 215, 160, 0.35);
+      backdrop-filter: blur(4px);
+    }
+
+    .aim-hint.hidden {
+      opacity: 0;
+    }
+
+    /* Modal Overlays (Pause / GameOver) */
+    .overlay-modal {
+      position: absolute;
+      inset: 0;
+      background: rgba(42, 7, 12, 0.78);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      z-index: 10;
+    }
+
+    .overlay-modal.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: linear-gradient(180deg, #8c2419 0%, #4a0d0a 100%);
+      border: 4px solid #ffd28a;
+      border-radius: 28px;
+      padding: 32px 36px;
+      width: min(90vw, 380px);
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 4px 12px rgba(255, 255, 255, 0.25);
+      color: #fff;
+      transform: translateY(15px);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .overlay-modal.visible .modal-card {
+      transform: translateY(0);
+    }
+
+    .modal-title {
+      font-size: 38px;
+      font-weight: 900;
+      margin-bottom: 12px;
+      text-shadow: 0 4px 0 #330604;
+      letter-spacing: 1px;
+    }
+
+    .modal-subtitle {
+      font-size: 18px;
+      color: #ffd8a8;
+      margin-bottom: 24px;
+      font-weight: 700;
+    }
+
+    .modal-score-box {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 24px;
+      border: 2px solid rgba(255, 220, 170, 0.2);
+    }
+
+    .modal-score-label {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #ffc98b;
+      margin-bottom: 4px;
+      font-weight: 800;
+    }
+
+    .modal-score-value {
+      font-size: 46px;
+      font-weight: 900;
+      color: #ffd700;
+      text-shadow: 0 3px 0 #703900;
+    }
+
+    .modal-btn {
+      cursor: pointer;
+      width: 100%;
+      padding: 15px 24px;
+      border-radius: 16px;
+      border: 3px solid #ffffff;
+      font-size: 20px;
+      font-weight: 900;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: linear-gradient(180deg, #42e638 0%, #169c11 100%);
+      box-shadow: 0 6px 0 #0c5e08, 0 10px 20px rgba(0,0,0,0.35);
+      transition: transform 0.1s ease, filter 0.1s ease;
+    }
+
+    .modal-btn:hover {
+      filter: brightness(1.08);
+    }
+
+    .modal-btn:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 #0c5e08, 0 4px 10px rgba(0,0,0,0.35);
+    }
+
+    .modal-btn.secondary {
+      background: linear-gradient(180deg, #ff9624 0%, #cc4908 100%);
+      box-shadow: 0 6px 0 #7a2600, 0 10px 20px rgba(0,0,0,0.35);
+    }
+
+    .modal-btn.secondary:active {
+      box-shadow: 0 2px 0 #7a2600, 0 4px 10px rgba(0,0,0,0.35);
+    }
+
+    .modal-btn.secondary.muted {
+      background: linear-gradient(180deg, #8c6d62 0%, #594139 100%);
+      box-shadow: 0 6px 0 #362520, 0 10px 20px rgba(0,0,0,0.35);
+    }
+
+    .audio-icon {
+      width: 26px;
+      height: 26px;
+      flex-shrink: 0;
+      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+    }
+
+    /* Hyper-Casual Starter Overlay (High Score Banner + Starter Shop Centered) */
+    .starter-shop {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(1);
+      width: min(95vw, 436px);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      pointer-events: none;
+      z-index: 6;
+      transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.18s ease;
+    }
+
+    .starter-shop.hidden {
+      opacity: 0;
+      transform: translate(-50%, -45%) scale(0.88);
+      pointer-events: none;
+    }
+
+    /* High Score Banner (Directly above Starter Shop) */
+    .highscore-banner {
+      position: relative;
+      background: linear-gradient(180deg, rgba(118, 30, 20, 0.95) 0%, rgba(62, 12, 9, 0.97) 100%);
+      border: 3px solid #ffd485;
+      border-radius: 22px;
+      padding: 20px 14px 12px;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55), inset 0 2px 8px rgba(255, 235, 190, 0.25);
+      backdrop-filter: blur(8px);
+      pointer-events: none;
+    }
+
+    .highscore-ribbon {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, #ffd84d 0%, #e07b00 100%);
+      border: 2.5px solid #ffffff;
+      border-radius: 999px;
+      padding: 3px 16px;
+      font-size: 12px;
+      font-weight: 900;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 1.4px;
+      text-shadow: 0 2px 0 #7a3300;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .highscore-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .highscore-stat-pill {
+      background: rgba(0, 0, 0, 0.32);
+      border: 1.5px solid rgba(255, 218, 155, 0.32);
+      border-radius: 14px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .highscore-stat-label {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #ffcf91;
+      margin-bottom: 2px;
+    }
+
+    .highscore-stat-value {
+      font-size: 24px;
+      font-weight: 900;
+      color: #ffd700;
+      text-shadow: 0 2px 0 #663000;
+      line-height: 1.1;
+    }
+
+    .shop-panel-box {
+      position: relative;
+      background: linear-gradient(180deg, rgba(112, 26, 18, 0.95) 0%, rgba(58, 10, 8, 0.97) 100%);
+      border: 3.5px solid #ffd485;
+      border-radius: 26px;
+      padding: 26px 12px 14px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65), inset 0 3px 10px rgba(255, 235, 190, 0.28);
+      backdrop-filter: blur(8px);
+      pointer-events: auto;
+    }
+
+    .starter-shop.hidden .shop-panel-box {
+      pointer-events: none;
+    }
+
+    .shop-ribbon {
+      position: absolute;
+      top: -17px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, #ffbe30 0%, #e8630a 100%);
+      border: 3px solid #ffffff;
+      border-radius: 999px;
+      padding: 4px 22px;
+      font-size: 14px;
+      font-weight: 900;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      text-shadow: 0 2px 0 #802b00;
+      box-shadow: 0 5px 12px rgba(0, 0, 0, 0.35);
+      white-space: nowrap;
+    }
+
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+    }
+
+    .shop-card {
+      cursor: pointer;
+      position: relative;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(0, 0, 0, 0.28) 100%);
+      border: 2px solid rgba(255, 218, 155, 0.35);
+      border-radius: 18px;
+      padding: 12px 7px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: transform 0.14s ease, border-color 0.14s ease;
+    }
+
+    .shop-card.featured {
+      background: linear-gradient(180deg, rgba(255, 190, 60, 0.22) 0%, rgba(40, 6, 4, 0.45) 100%);
+      border-color: #ffd778;
+    }
+
+    .shop-card.ghost-card {
+      background: linear-gradient(180deg, rgba(64, 232, 255, 0.18) 0%, rgba(12, 34, 48, 0.45) 100%);
+      border-color: rgba(112, 248, 255, 0.65);
+    }
+
+    .shop-card.fire-card {
+      background: linear-gradient(180deg, rgba(255, 102, 0, 0.22) 0%, rgba(48, 10, 4, 0.48) 100%);
+      border-color: rgba(255, 154, 60, 0.72);
+    }
+
+    .shop-card.upgrade-flash {
+      animation: cardFlash 0.38s ease;
+    }
+
+    @keyframes cardFlash {
+      0% { transform: scale(1); }
+      45% { transform: scale(1.07); border-color: #6bff6b; }
+      100% { transform: scale(1); }
+    }
+
+    .shop-lvl-badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: rgba(0, 0, 0, 0.48);
+      border: 1px solid rgba(255, 220, 150, 0.4);
+      color: #ffd76e;
+      font-size: 9px;
+      font-weight: 900;
+      padding: 2px 6px;
+      border-radius: 999px;
+      letter-spacing: 0.4px;
+    }
+
+    .shop-icon-wrap {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.32), rgba(0, 0, 0, 0.25));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 6px;
+      position: relative;
+      box-shadow: inset 0 2px 5px rgba(255,255,255,0.25);
+    }
+
+    .shop-ball-sphere {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #ffffff 0%, #dceaff 65%, #9bb8e8 100%);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.45);
+    }
+
+    .shop-ball-sphere.ghost {
+      background: radial-gradient(circle at 35% 30%, #ffffff 0%, #6ef7ff 55%, #007ca6 100%);
+      box-shadow: 0 0 12px rgba(82, 247, 255, 0.85);
+    }
+
+    .shop-ball-sphere.fire {
+      background: radial-gradient(circle at 35% 30%, #fff2a6 0%, #ff6a00 55%, #b81d00 100%);
+      box-shadow: 0 0 12px rgba(255, 98, 0, 0.9);
+    }
+
+    .shop-plus-one {
+      position: absolute;
+      bottom: -2px;
+      right: -4px;
+      background: linear-gradient(180deg, #4ae842 0%, #14990e 100%);
+      border: 2px solid #ffffff;
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 900;
+      padding: 1px 5px;
+      border-radius: 999px;
+      text-shadow: 0 1px 0 #095205;
+    }
+
+    .shop-card-title {
+      font-size: 12px;
+      font-weight: 900;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 2px;
+      text-shadow: 0 2px 0 rgba(0,0,0,0.5);
+    }
+
+    .shop-card-stat {
+      font-size: 11px;
+      font-weight: 800;
+      color: #ffdf9e;
+      margin-bottom: 8px;
+    }
+
+    .shop-buy-btn {
+      cursor: pointer;
+      width: 100%;
+      padding: 8px 6px;
+      border-radius: 12px;
+      border: 2.5px solid #ffffff;
+      background: linear-gradient(180deg, #44eb3b 0%, #169c11 100%);
+      box-shadow: 0 5px 0 #0b5907, 0 6px 12px rgba(0, 0, 0, 0.35);
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 900;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      text-shadow: 0 2px 0 #0a4f06;
+      transition: transform 0.1s ease, filter 0.12s ease;
+    }
+
+    .shop-buy-btn:hover {
+      filter: brightness(1.08);
+    }
+
+    .shop-buy-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #0b5907, 0 3px 6px rgba(0, 0, 0, 0.35);
+    }
+
+    .shop-buy-btn.locked {
+      background: linear-gradient(180deg, #876c63 0%, #57413a 100%);
+      box-shadow: 0 5px 0 #33231e, 0 6px 12px rgba(0, 0, 0, 0.3);
+      border-color: rgba(255, 255, 255, 0.65);
+      text-shadow: 0 2px 0 #2b1d18;
+      opacity: 0.92;
+    }
+
+    .shop-buy-btn.locked:active {
+      transform: translateY(2px);
+      box-shadow: 0 3px 0 #33231e;
+    }
+
+    .shop-buy-btn.shake {
+      animation: btnShake 0.3s ease;
+    }
+
+    @keyframes btnShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .shop-coin-mini {
+      width: 17px;
+      height: 17px;
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 600px) {
+      .wave-counter {
+        font-size: 48px;
+        top: 12px;
+      }
+      .special-banner-wrap {
+        top: 66px;
+      }
+      .special-banner-pill {
+        font-size: 11px;
+        padding: 5px 12px;
+      }
+      .star-badge {
+        font-size: 22px;
+      }
+      .btn-icon {
+        width: 48px;
+        height: 48px;
+      }
+      .btn-fast-forward {
+        width: 62px;
+        height: 62px;
+        right: 16px;
+        bottom: 16px;
+      }
+      .aim-hint {
+        font-size: 13px;
+        padding: 6px 14px;
+        bottom: 15%;
+      }
+      .shop-panel-box {
+        padding: 22px 9px 11px;
+      }
+      .highscore-banner {
+        padding: 18px 10px 10px;
+      }
+    }
+  </style>
+  <script type="module" crossorigin src="./assets/index-DjSvXFZY.js"></script>
+</head>
+<body>
+  <div id="game-container">
+    <canvas id="webgl-canvas"></canvas>
+
+    <div id="ui-layer">
+      <!-- Top HUD -->
+      <div class="hud-top">
+        <div class="star-badge" id="coin-badge">
+          <svg class="star-icon" viewBox="0 0 28 28" fill="none">
+            <circle cx="14" cy="14" r="12.5" fill="url(#coinGrad)" stroke="#B86B00" stroke-width="2"/>
+            <circle cx="14" cy="14" r="9.2" fill="#E69A00" stroke="#FFF3A8" stroke-width="1.4"/>
+            <rect x="12.2" y="8.5" width="3.6" height="11" rx="1.8" fill="#FFF7C2"/>
+            <defs>
+              <linearGradient id="coinGrad" x1="3" y1="2" x2="25" y2="26" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#FFF296"/>
+                <stop offset="50%" stop-color="#FFD000"/>
+                <stop offset="100%" stop-color="#D47E00"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <span id="star-count">0</span>
+        </div>
+
+        <div class="wave-counter" id="wave-count">1</div>
+
+        <!-- Right HUD Column: Pause Button + Special Ball Ability Buttons -->
+        <div class="hud-right-col">
+          <button class="btn-icon" id="btn-pause" aria-label="Pause Game">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <rect x="6" y="4" width="4.5" height="16" rx="2" fill="#FFFFFF"/>
+              <rect x="13.5" y="4" width="4.5" height="16" rx="2" fill="#FFFFFF"/>
+            </svg>
+          </button>
+
+          <!-- Special Ball Ability Buttons right under Pause Button -->
+          <div class="ability-hud-list">
+            <button class="ability-hud-btn" id="btn-hud-ghost" title="Activate Ghost Ball (First 5 balls pierce all cylinders)">
+              <span class="ability-hud-orb ghost">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 3C7.58 3 4 6.58 4 11V20L6.67 18L9.33 20L12 18L14.67 20L17.33 18L20 20V11C20 6.58 16.42 3 12 3Z" fill="#FFFFFF"/>
+                  <circle cx="9.5" cy="10.5" r="1.5" fill="#005073"/>
+                  <circle cx="14.5" cy="10.5" r="1.5" fill="#005073"/>
+                </svg>
+              </span>
+              <span class="ability-hud-count" id="hud-ghost-count">0</span>
+            </button>
+
+            <button class="ability-hud-btn" id="btn-hud-fire" title="Activate Fire Ball (First 3 balls instantly destroy cylinders)">
+              <span class="ability-hud-orb fire">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M13.5 2C13.5 2 15.5 6 12.5 9C10.5 7 9.5 4.5 9.5 4.5C6 7.5 5 11.5 5 14C5 18.42 8.58 22 13 22C17.42 22 20 18.42 20 14C20 9 16.5 5 13.5 2Z" fill="#FFF6B3"/>
+                </svg>
+              </span>
+              <span class="ability-hud-count" id="hud-fire-count">0</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Animated Top Notification Banner for Active Special Balls -->
+      <div class="special-banner-wrap" id="special-banner-wrap">
+        <div class="special-banner-pill fire hidden" id="banner-fire">
+          <span>🔥 FIRE BALL: 3x INSTA-KILL!</span>
+        </div>
+        <div class="special-banner-pill ghost hidden" id="banner-ghost">
+          <span>👻 GHOST BALL: 5x PIERCE!</span>
+        </div>
+      </div>
+
+      <!-- Aiming Hint -->
+      <div class="aim-hint" id="aim-hint">Drag Back &amp; Release to Launch</div>
+
+      <!-- Hyper-Casual Starter Overlay (High Score Banner + Starter Shop Panel) -->
+      <div class="starter-shop" id="starter-shop">
+        <!-- High Score Banner directly above Starter Shop -->
+        <div class="highscore-banner">
+          <div class="highscore-ribbon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="#FFF4B8" stroke="#803300" stroke-width="1.6" stroke-linejoin="round"/>
+            </svg>
+            <span>HIGH SCORE</span>
+          </div>
+          <div class="highscore-grid">
+            <div class="highscore-stat-pill">
+              <span class="highscore-stat-label">Best Wave</span>
+              <span class="highscore-stat-value" id="best-wave-val">1</span>
+            </div>
+            <div class="highscore-stat-pill">
+              <span class="highscore-stat-label">Numbers Cleared</span>
+              <span class="highscore-stat-value" id="best-hits-val">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Starter Shop Panel Box -->
+        <div class="shop-panel-box">
+          <div class="shop-ribbon">STARTER SHOP</div>
+          <div class="shop-grid">
+            <!-- Card 1: Starting Ball Count -->
+            <div class="shop-card featured" id="card-start-balls">
+              <span class="shop-lvl-badge" id="lbl-ball-lvl">LV. 1</span>
+              <div class="shop-icon-wrap">
+                <div class="shop-ball-sphere"></div>
+                <span class="shop-plus-one">+1</span>
+              </div>
+              <div class="shop-card-title">Start Balls</div>
+              <div class="shop-card-stat" id="lbl-ball-stat">1 ➔ 2 Balls</div>
+              <button class="shop-buy-btn" id="btn-buy-start-ball">
+                <svg class="shop-coin-mini" viewBox="0 0 28 28" fill="none">
+                  <circle cx="14" cy="14" r="12.5" fill="#FFD000" stroke="#B86B00" stroke-width="2"/>
+                  <circle cx="14" cy="14" r="8.5" fill="#E69A00" stroke="#FFF3A8" stroke-width="1.4"/>
+                  <rect x="12.3" y="8.8" width="3.4" height="10.4" rx="1.7" fill="#FFF7C2"/>
+                </svg>
+                <span id="lbl-ball-cost">10</span>
+              </button>
+            </div>
+
+            <!-- Card 2: Ghost Ball (Fixed 10 Gold) -->
+            <div class="shop-card ghost-card" id="card-ghost-ball">
+              <span class="shop-lvl-badge" id="lbl-ghost-owned">x0</span>
+              <div class="shop-icon-wrap">
+                <div class="shop-ball-sphere ghost"></div>
+                <span class="shop-plus-one">+1</span>
+              </div>
+              <div class="shop-card-title">Ghost Ball</div>
+              <div class="shop-card-stat">5x Pierce</div>
+              <button class="shop-buy-btn" id="btn-buy-ghost-ball">
+                <svg class="shop-coin-mini" viewBox="0 0 28 28" fill="none">
+                  <circle cx="14" cy="14" r="12.5" fill="#FFD000" stroke="#B86B00" stroke-width="2"/>
+                  <circle cx="14" cy="14" r="8.5" fill="#E69A00" stroke="#FFF3A8" stroke-width="1.4"/>
+                  <rect x="12.3" y="8.8" width="3.4" height="10.4" rx="1.7" fill="#FFF7C2"/>
+                </svg>
+                <span>10</span>
+              </button>
+            </div>
+
+            <!-- Card 3: Fire Ball (Fixed 15 Gold) -->
+            <div class="shop-card fire-card" id="card-fire-ball">
+              <span class="shop-lvl-badge" id="lbl-fire-owned">x0</span>
+              <div class="shop-icon-wrap">
+                <div class="shop-ball-sphere fire"></div>
+                <span class="shop-plus-one">+1</span>
+              </div>
+              <div class="shop-card-title">Fire Ball</div>
+              <div class="shop-card-stat">3x Insta-Kill</div>
+              <button class="shop-buy-btn" id="btn-buy-fire-ball">
+                <svg class="shop-coin-mini" viewBox="0 0 28 28" fill="none">
+                  <circle cx="14" cy="14" r="12.5" fill="#FFD000" stroke="#B86B00" stroke-width="2"/>
+                  <circle cx="14" cy="14" r="8.5" fill="#E69A00" stroke="#FFF3A8" stroke-width="1.4"/>
+                  <rect x="12.3" y="8.8" width="3.4" height="10.4" rx="1.7" fill="#FFF7C2"/>
+                </svg>
+                <span>15</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fast Forward Button -->
+      <button class="btn-fast-forward" id="btn-fast-forward" aria-label="Fast Forward">
+        <svg width="38" height="38" viewBox="0 0 24 24" fill="none">
+          <path d="M4 5L12 12L4 19V5Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M13 5L21 12L13 19V5Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <!-- Pause Modal -->
+      <div class="overlay-modal" id="pause-modal">
+        <div class="modal-card">
+          <div class="modal-title">PAUSED</div>
+          <div class="modal-subtitle">Take a breather!</div>
+          <button class="modal-btn" id="btn-resume">Resume</button>
+          <button class="modal-btn secondary" id="btn-toggle-audio" aria-label="Toggle Sound">
+            <!-- Speaker ON Icon -->
+            <svg class="audio-icon" id="icon-sound-on" viewBox="0 0 24 24" fill="none">
+              <path d="M11 5L6 9H2V15H6L11 19V5Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="1.8" stroke-linejoin="round"/>
+              <path d="M15.54 8.46C16.48 9.4 17.01 10.67 17.01 12C17.01 13.33 16.48 14.6 15.54 15.54" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round"/>
+              <path d="M19.07 4.93C20.94 6.8 22 9.35 22 12C22 14.65 20.94 17.2 19.07 19.07" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round"/>
+            </svg>
+            <!-- Speaker OFF (Muted) Icon -->
+            <svg class="audio-icon" id="icon-sound-off" viewBox="0 0 24 24" fill="none" style="display: none;">
+              <path d="M11 5L6 9H2V15H6L11 19V5Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="1.8" stroke-linejoin="round"/>
+              <path d="M22 9L16 15" stroke="#FFD28A" stroke-width="2.6" stroke-linecap="round"/>
+              <path d="M16 9L22 15" stroke="#FFD28A" stroke-width="2.6" stroke-linecap="round"/>
+            </svg>
+            <span id="label-sound">Sound: ON</span>
+          </button>
+          <button class="modal-btn secondary" id="btn-restart-pause">Restart</button>
+        </div>
+      </div>
+
+      <!-- Game Over Modal -->
+      <div class="overlay-modal" id="gameover-modal">
+        <div class="modal-card">
+          <div class="modal-title">GAME OVER</div>
+          <div class="modal-subtitle">The cylinders reached the line!</div>
+          <div class="highscore-grid" style="margin-bottom: 22px;">
+            <div class="modal-score-box" style="margin-bottom: 0; padding: 12px 8px;">
+              <div class="modal-score-label" style="font-size: 11px;">Wave Reached</div>
+              <div class="modal-score-value" id="final-wave-score" style="font-size: 36px;">1</div>
+            </div>
+            <div class="modal-score-box" style="margin-bottom: 0; padding: 12px 8px;">
+              <div class="modal-score-label" style="font-size: 11px;">Numbers Cleared</div>
+              <div class="modal-score-value" id="final-hits-score" style="font-size: 36px;">0</div>
+            </div>
+          </div>
+          <button class="modal-btn" id="btn-retry">Play Again</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
