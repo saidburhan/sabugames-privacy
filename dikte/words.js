@@ -334,12 +334,10 @@ const WORD_CATEGORIES = [
   }
 ];
 
-// Geriye dönük uyumluluk için her kategoriye birleşik items dizisi ekle
 WORD_CATEGORIES.forEach((cat) => {
   cat.items = [...cat.words, ...cat.sentences];
 });
 
-// İlk açılışta 1. Grup (A-N-E-T-İ-L) ile başla
 const DEFAULT_SELECTED_ITEMS = [
   "el",
   "lale",
