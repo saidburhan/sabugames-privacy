@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Neşeli Dikte Yarışı ⭐ 1. Sınıf Dikte Oyunu</title>
+  <meta name="description" content="1. sınıf öğrencileri için eğlenceli, sesli, iki kişilik yıldız ödüllü dikte çalışması web uygulaması." />
+  <meta name="theme-color" content="#FFFDF5" />
+  <!-- Çocuklara uygun, tam Türkçe karakter (latin-ext: ğ, ş, İ, ı, ç, ö, ü) destekli yuvarlak hatlı fontlar -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Arka Plan Süslemeleri (Bulutlar ve Yıldızlar) -->
+  <div class="bg-decorations" aria-hidden="true">
+    <div class="bg-cloud cloud-1">☁️</div>
+    <div class="bg-cloud cloud-2">☁️</div>
+    <div class="bg-cloud cloud-3">☁️</div>
+    <div class="bg-star star-1">✨</div>
+    <div class="bg-star star-2">⭐</div>
+    <div class="bg-star star-3">🌟</div>
+    <div class="bg-star star-4">✏️</div>
+  </div>
+
+  <!-- Konfeti ve Uçan Yıldız Katmanı -->
+  <div id="fx-layer" class="fx-layer" aria-hidden="true"></div>
+
+  <!-- ÜST BAR (Her ekranda erişilebilir) -->
+  <header class="app-header">
+    <div class="brand-group" id="brandHomeBtn" title="Ana Ekrana Dön">
+      <div class="mascot-badge" aria-hidden="true">
+        <svg viewBox="0 0 64 64" width="42" height="42" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="32" cy="32" r="30" fill="#FEF08A" stroke="#F59E0B" stroke-width="3"/>
+          <!-- Sevimli Baykuş / Kalem Maskot -->
+          <ellipse cx="32" cy="36" rx="18" ry="16" fill="#38BDF8" stroke="#0284C7" stroke-width="2.5"/>
+          <ellipse cx="32" cy="40" rx="11" ry="10" fill="#E0F2FE"/>
+          <circle cx="25" cy="30" r="6" fill="#FFFFFF" stroke="#0284C7" stroke-width="2"/>
+          <circle cx="39" cy="30" r="6" fill="#FFFFFF" stroke="#0284C7" stroke-width="2"/>
+          <circle cx="25" cy="30" r="2.8" fill="#0F172A"/>
+          <circle cx="39" cy="30" r="2.8" fill="#0F172A"/>
+          <circle cx="26" cy="29" r="1" fill="#FFFFFF"/>
+          <circle cx="40" cy="29" r="1" fill="#FFFFFF"/>
+          <path d="M29 35L32 39L35 35Z" fill="#FB923C" stroke="#EA580C" stroke-width="1.5" stroke-linejoin="round"/>
+          <!-- Mezuniyet/Okul Kepi -->
+          <path d="M16 21L32 14L48 21L32 27L16 21Z" fill="#1E293B" stroke="#0F172A" stroke-width="2" stroke-linejoin="round"/>
+          <circle cx="32" cy="20" r="2" fill="#FACC15"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>Neşeli Dikte Yarışı</h1>
+        <span class="brand-subtitle">1. Sınıf Sesli Yazma Düellosu ⭐</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" id="btnOpenAdmin" class="btn-header-action btn-admin-trigger" title="Yönetici Girişi ve Supabase Kelime Yönetimi">
+        🔐 <span id="adminBtnLabel">Yönetici</span>
+      </button>
+      <button type="button" id="btnBackToSetup" class="btn-header-action hidden" title="Ayarlara ve Kelime Havuzuna Dön">
+        ⚙️ Kurulum
+      </button>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <!-- ==========================================
+         EKRAN 1: KURULUM, OYUNCULAR VE KELİME HAVUZU
+         ========================================== -->
+    <section id="setupScreen" class="screen active">
+      <!-- Üst Bilgi Banner -->
+      <div class="welcome-banner">
+        <div class="welcome-banner-icon">📝✨</div>
+        <div class="welcome-banner-content">
+          <h2>Kağıtları ve Kalemleri Hazırlayın!</h2>
+          <p>Uygulama sıradaki kelime veya cümleyi <strong>1 saniye aralıklarla</strong> sesli tekrar eder. Kağıdına ilk doğru yazan kendi kutusuna basar ve <strong>⭐ yıldızı</strong> kapar!</p>
+        </div>
+      </div>
+
+      <div class="setup-grid">
+        <!-- SOL SÜTUN: OYUNCULAR VE SES AYARLARI -->
+        <div class="setup-column">
+          <!-- Oyuncular Kartı -->
+          <div class="card card-players">
+            <div class="card-header">
+              <span class="card-icon">🏆</span>
+              <div>
+                <h3>Yarışmacılar</h3>
+                <p>Oyuncu isimlerini ve karakterlerini seçin</p>
+              </div>
+            </div>
+
+            <div class="players-setup-row">
+              <!-- 1. Oyuncu (Default: Berk) -->
+              <div class="player-setup-box player-1-theme">
+                <div class="player-badge-tag">1. Oyuncu (Sol)</div>
+                <div class="avatar-picker-row">
+                  <button type="button" class="avatar-cycle-btn" id="p1AvatarPrev" aria-label="Önceki Karakter">◀</button>
+                  <div class="avatar-preview" id="p1AvatarDisplay">🦁</div>
+                  <button type="button" class="avatar-cycle-btn" id="p1AvatarNext" aria-label="Sonraki Karakter">▶</button>
+                </div>
+                <label for="p1NameInput" class="sr-only">1. Oyuncu İsmi</label>
+                <input
+                  type="text"
+                  id="p1NameInput"
+                  class="player-name-input"
+                  value="Berk"
+                  maxlength="18"
+                  placeholder="1. Oyuncu Adı"
+                />
+              </div>
+
+              <div class="vs-divider" aria-hidden="true">
+                <span>VS</span>
+              </div>
+
+              <!-- 2. Oyuncu (Default: Said) -->
+              <div class="player-setup-box player-2-theme">
+                <div class="player-badge-tag">2. Oyuncu (Sağ)</div>
+                <div class="avatar-picker-row">
+                  <button type="button" class="avatar-cycle-btn" id="p2AvatarPrev" aria-label="Önceki Karakter">◀</button>
+                  <div class="avatar-preview" id="p2AvatarDisplay">🚀</div>
+                  <button type="button" class="avatar-cycle-btn" id="p2AvatarNext" aria-label="Sonraki Karakter">▶</button>
+                </div>
+                <label for="p2NameInput" class="sr-only">2. Oyuncu İsmi</label>
+                <input
+                  type="text"
+                  id="p2NameInput"
+                  class="player-name-input"
+                  value="Said"
+                  maxlength="18"
+                  placeholder="2. Oyuncu Adı"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Ses ve Dikte Ayarları Kartı -->
+          <div class="card card-voice">
+            <div class="card-header">
+              <span class="card-icon">🔊</span>
+              <div>
+                <h3>Dikte Hızı ve Tekrar Ayarları</h3>
+                <p>Doğal Türkçe öğretmen sesi ile okunur</p>
+              </div>
+            </div>
+
+            <div class="voice-controls-row">
+              <button type="button" id="btnTestVoice" class="btn-secondary btn-test-voice">
+                🔔 Sesi Test Et
+              </button>
+            </div>
+
+            <!-- Tekrar Aralığı ve Hız Ayarı -->
+            <div class="dictation-tuning-box">
+              <div class="tuning-item">
+                <label for="repeatIntervalSelect">⏱️ Tekrar Aralığı:</label>
+                <select id="repeatIntervalSelect" class="candy-select">
+                  <option value="800">0.8 Saniye (Hızlı)</option>
+                  <option value="1000" selected>1 Saniye (Standart)</option>
+                  <option value="1500">1.5 Saniye (Rahat)</option>
+                  <option value="2000">2 Saniye (Geniş)</option>
+                </select>
+              </div>
+
+              <div class="tuning-item">
+                <label for="speechRateSelect">🐢 Okuma Hızı:</label>
+                <select id="speechRateSelect" class="candy-select">
+                  <option value="0.82">Yavaş (Tane Tane)</option>
+                  <option value="0.92" selected>Normal (Net Dikte)</option>
+                  <option value="1.0">Doğal Hız</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="dictation-options-row">
+              <label class="candy-checkbox-label">
+                <input type="checkbox" id="chkHideTextDuringDictation" checked />
+                <span class="checkbox-custom"></span>
+                <span>Dikte sırasında kelimeyi ekranda gizle <em>(Dinleyerek yazsınlar)</em></span>
+              </label>
+
+              <label class="candy-checkbox-label">
+                <input type="checkbox" id="chkShuffleWords" />
+                <span class="checkbox-custom"></span>
+                <span>Yarış başlarken listeyi karıştır 🔀</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- SAĞ SÜTUN: KELİME & CÜMLE EKLEME VE HAVUZ -->
+        <div class="setup-column">
+          <div class="card card-pool">
+            <div class="card-header">
+              <span class="card-icon">📚</span>
+              <div>
+                <h3>Dikte Kelime ve Cümleleri</h3>
+                <p>Kendiniz ekleyin veya 1. sınıf harf gruplarından seçin</p>
+              </div>
+            </div>
+
+            <!-- Kendin Kelime / Cümle Ekle -->
+            <div class="custom-add-box">
+              <label for="customWordInput" class="section-sub-label">✏️ Yeni Kelime veya Cümle Ekle:</label>
+              <div class="custom-input-row">
+                <input
+                  type="text"
+                  id="customWordInput"
+                  class="candy-text-input"
+                  placeholder="Örn: elma  veya  Ela lale al."
+                  autocomplete="off"
+                />
+                <button type="button" id="btnAddCustomWord" class="btn-add-word">
+                  ➕ Ekle
+                </button>
+              </div>
+              <span class="input-hint">İpucu: Virgülle birden fazla kelime/cümle de ekleyebilirsiniz.</span>
+            </div>
+
+            <!-- Hazır 1. Sınıf Havuzu (MEB Yeni Müfredat Harf Grupları) -->
+            <div class="pool-browser-box">
+              <div class="pool-header-row">
+                <span class="section-sub-label">🌟 MEB 1. Sınıf Harf Grupları:</span>
+                <div class="pool-quick-btns">
+                  <button type="button" id="btnAddCategoryAll" class="btn-mini-pill">➕ Grubu Ekle</button>
+                  <button type="button" id="btnRandomGroup10" class="btn-mini-pill btn-mini-accent">🎲 Gruptan 10 Seç</button>
+                  <button type="button" id="btnRandomMix" class="btn-mini-pill">🔀 Karışık 10 Seç</button>
+                </div>
+              </div>
+
+              <!-- Kategori Sekmeleri (1. Grup ANETİL ... 5. Grup PHVĞFJ) -->
+              <div id="categoryTabs" class="category-tabs" role="tablist"></div>
+
+              <!-- Seçili Harf Grubu Bilgi ve Filtre Çubuğu -->
+              <div class="group-info-banner" id="groupInfoBanner">
+                <div class="group-letters-row" id="groupLettersTiles"></div>
+                <div class="group-type-filter" role="group" aria-label="Kelime veya Cümle Filtresi">
+                  <button type="button" class="type-filter-btn active" data-filter="all">Tümü</button>
+                  <button type="button" class="type-filter-btn" data-filter="words">🔤 Kelimeler</button>
+                  <button type="button" class="type-filter-btn" data-filter="sentences">📖 Cümleler</button>
+                </div>
+              </div>
+
+              <!-- Seçili Kategorideki Kelime/Cümle Çipleri -->
+              <div id="categoryItemsContainer" class="pool-chips-container"></div>
+            </div>
+
+            <!-- Aktif Seçili Dikte Listesi -->
+            <div class="selected-queue-box">
+              <div class="queue-header-row">
+                <div>
+                  <span class="section-sub-label">📋 Dikte Edilecek Sıra (<span id="selectedCountBadge">0</span> adet):</span>
+                </div>
+                <div class="queue-actions">
+                  <button type="button" id="btnReverseQueue" class="btn-text-action" title="Sırayı Ters Çevir">⇅ Ters Çevir</button>
+                  <button type="button" id="btnClearQueue" class="btn-text-action danger" title="Listeyi Temizle">🗑️ Tümünü Sil</button>
+                </div>
+              </div>
+
+              <div id="selectedQueueList" class="selected-queue-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DEV BAŞLAT BUTONU ALANI -->
+      <div class="start-game-bar">
+        <button type="button" id="btnStartGame" class="btn-giant-start">
+          <span class="start-btn-icon">🚀</span>
+          <span class="start-btn-text">DİKTE YARIŞINI BAŞLAT!</span>
+          <span class="start-btn-sub" id="startBtnSubtext">10 kelime/cümle hazır</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         EKRAN 2: CANLI DİKTE DÜELLOSU EKRANI
+         ========================================== -->
+    <section id="gameScreen" class="screen">
+      <!-- Üst/Orta Canlı Dikte Kontrol Paneli -->
+      <div class="dictation-stage-bar">
+        <div class="stage-progress-pill">
+          <span class="stage-step-badge" id="gameStepCounter">1 / 10</span>
+          <div class="stage-progress-track">
+            <div class="stage-progress-fill" id="gameProgressBar" style="width: 10%"></div>
+          </div>
+        </div>
+
+        <!-- Ortadaki Konuşan Hoparlör & Kelime Kartı -->
+        <div class="speaker-center-card" id="speakerCenterCard">
+          <div class="speaker-wave-wrapper" id="speakerWaveWrapper">
+            <div class="wave-ring ring-1"></div>
+            <div class="wave-ring ring-2"></div>
+            <button type="button" id="btnRepeatNow" class="speaker-orb-btn" title="Hemen Tekrar Söyle">
+              <span class="orb-icon">🔊</span>
+            </button>
+          </div>
+
+          <div class="dictation-live-info">
+            <div class="dictation-status-line">
+              <span class="live-dot" id="livePulseDot"></span>
+              <span id="dictationStatusText">Dinleyin ve kağıda yazın! (1 sn arayla tekrar ediyor)</span>
+            </div>
+
+            <!-- Gizli veya Gösterilen Kelime/Cümle -->
+            <div class="dictation-word-box" id="dictationWordBox">
+              <div id="wordHiddenMask" class="word-hidden-mask">
+                <span class="ear-icon">👂✏️</span>
+                <span class="mask-label">Sesi Dinle ve Kağıdına Yaz!</span>
+              </div>
+              <div id="wordVisibleText" class="word-visible-text hidden">ELMA</div>
+            </div>
+          </div>
+
+          <div class="stage-utility-btns">
+            <button type="button" id="btnToggleReveal" class="btn-stage-tool" title="Kelimeyi Ekranda Göster / Gizle">
+              👁️ <span id="toggleRevealLabel">Göster</span>
+            </button>
+            <button type="button" id="btnPauseResume" class="btn-stage-tool" title="Sesi Duraklat / Devam Et">
+              ⏸️ <span id="pauseResumeLabel">Duraklat</span>
+            </button>
+            <button type="button" id="btnSkipWord" class="btn-stage-tool" title="Yıldız Vermeden Sonraki Kelimeye Geç">
+              ⏭️ <span>Atla</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- İKİ OYUNCULU BÖLÜNMÜŞ YARIŞ ALANI (Hem Mobil Hem PC Uyumlu) -->
+      <div class="duel-arena" id="duelArena">
+        <!-- 1. OYUNCU BÖLÜMÜ (BERK) -->
+        <div class="player-zone player-1-zone" id="player1Zone">
+          <div class="zone-header">
+            <div class="zone-identity">
+              <span class="zone-avatar" id="gameP1Avatar">🦁</span>
+              <div class="zone-name-wrap">
+                <h2 class="zone-player-name" id="gameP1Name">Berk</h2>
+                <span class="zone-key-hint">Sol Taraf (Klavye: A)</span>
+              </div>
+            </div>
+            <div class="zone-score-pill" id="p1ScorePill">
+              <span class="score-star-icon">⭐</span>
+              <span class="score-number" id="gameP1Score">0</span>
+            </div>
+          </div>
+
+          <!-- Kazanılan Yıldızlar Kutusu -->
+          <div class="stars-tray" id="p1StarsTray" aria-label="1. Oyuncu Yıldızları">
+            <span class="empty-tray-hint">İlk yıldızını kazanmak için bitirince düğmeye bas!</span>
+          </div>
+
+          <!-- DEV DOKUNMATİK / TIKLAMA ALANI -->
+          <button type="button" class="player-tap-button p1-tap-btn" id="btnPlayer1Claim">
+            <span class="tap-star-burst">⭐</span>
+            <span class="tap-main-title">BEN YAZDIM!</span>
+            <span class="tap-sub-title"><strong id="btnP1SubName">Berk</strong> bitirdiyse buraya dokun!</span>
+          </button>
+        </div>
+
+        <!-- 2. OYUNCU BÖLÜMÜ (SAİD) -->
+        <div class="player-zone player-2-zone" id="player2Zone">
+          <div class="zone-header">
+            <div class="zone-identity">
+              <span class="zone-avatar" id="gameP2Avatar">🚀</span>
+              <div class="zone-name-wrap">
+                <h2 class="zone-player-name" id="gameP2Name">Said</h2>
+                <span class="zone-key-hint">Sağ Taraf (Klavye: L)</span>
+              </div>
+            </div>
+            <div class="zone-score-pill" id="p2ScorePill">
+              <span class="score-star-icon">⭐</span>
+              <span class="score-number" id="gameP2Score">0</span>
+            </div>
+          </div>
+
+          <!-- Kazanılan Yıldızlar Kutusu -->
+          <div class="stars-tray" id="p2StarsTray" aria-label="2. Oyuncu Yıldızları">
+            <span class="empty-tray-hint">İlk yıldızını kazanmak için bitirince düğmeye bas!</span>
+          </div>
+
+          <!-- DEV DOKUNMATİK / TIKLAMA ALANI -->
+          <button type="button" class="player-tap-button p2-tap-btn" id="btnPlayer2Claim">
+            <span class="tap-star-burst">⭐</span>
+            <span class="tap-main-title">BEN YAZDIM!</span>
+            <span class="tap-sub-title"><strong id="btnP2SubName">Said</strong> bitirdiyse buraya dokun!</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Kelime Tamamlandı / Yıldız Kazanıldı Geçiş Katmanı -->
+      <div id="roundWinnerOverlay" class="round-winner-overlay hidden" aria-live="polite">
+        <div class="round-winner-card">
+          <div class="round-star-anim">⭐</div>
+          <h3 id="roundWinnerTitle">Harika! Berk Yıldızı Kaptı!</h3>
+          <div class="round-revealed-word-box">
+            <span class="revealed-caption">Dikte Edilen:</span>
+            <p id="roundRevealedWord" class="revealed-word-text">elma</p>
+          </div>
+          <p class="round-next-hint" id="roundNextHint">Sıradaki kelimeye geçiliyor...</p>
+          <button type="button" id="btnForceNextNow" class="btn-Quick-Next">Hemen Sıradakine Geç ➔</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         EKRAN 3: OYUN SONU ŞAMPİYONLUK EKRANI
+         ========================================== -->
+    <section id="resultScreen" class="screen">
+      <div class="results-card">
+        <div class="trophy-illustration" aria-hidden="true">🏆🌟</div>
+        <h2 id="winnerHeadline" class="winner-headline">Tebrikler! Harika Bir Dikte Çalışmasıydı!</h2>
+        <p id="winnerSubtext" class="winner-subtext">İkiniz de ellerinize sağlık, çok güzel yazdınız!</p>
+
+        <!-- İki Oyuncu Final Skor Kartları -->
+        <div class="final-scoreboard">
+          <div class="final-player-card p1-final" id="finalCardP1">
+            <div class="final-crown hidden" id="finalCrownP1">👑</div>
+            <div class="final-avatar" id="finalP1Avatar">🦁</div>
+            <h3 id="finalP1Name">Berk</h3>
+            <div class="final-star-count">
+              <span>⭐</span>
+              <strong id="finalP1Stars">0</strong>
+              <span>Yıldız</span>
+            </div>
+            <div class="final-stars-visual" id="finalP1StarsVisual"></div>
+          </div>
+
+          <div class="final-player-card p2-final" id="finalCardP2">
+            <div class="final-crown hidden" id="finalCrownP2">👑</div>
+            <div class="final-avatar" id="finalP2Avatar">🚀</div>
+            <h3 id="finalP2Name">Said</h3>
+            <div class="final-star-count">
+              <span>⭐</span>
+              <strong id="finalP2Stars">0</strong>
+              <span>Yıldız</span>
+            </div>
+            <div class="final-stars-visual" id="finalP2StarsVisual"></div>
+          </div>
+        </div>
+
+        <!-- Kağıt Kontrol Özeti (Yazılan Kelimeler ve Kim Yıldız Aldı) -->
+        <div class="paper-check-section">
+          <h4>📋 Kağıt Kontrol Listesi (Yazılan Kelime ve Cümleler)</h4>
+          <p class="paper-check-sub">Kağıtlarınızdaki yazıları buradan birlikte kontrol edebilirsiniz:</p>
+          <div id="completedWordsSummary" class="completed-words-grid"></div>
+        </div>
+
+        <div class="results-actions">
+          <button type="button" id="btnPlayAgainSame" class="btn-giant-start btn-replay">
+            🔄 Aynı Kelimelerle Tekrar Yarış!
+          </button>
+          <button type="button" id="btnBackToPoolFromResult" class="btn-secondary btn-large-secondary">
+            📚 Yeni Kelime / Cümle Seç
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==========================================
+       YÖNETİCİ GİRİŞİ VE SUPABASE KELİME YÖNETİM MODALI
+       ========================================== -->
+  <div id="adminModal" class="admin-modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="adminModalTitle">
+    <div class="admin-modal-card">
+      <div class="admin-modal-header">
+        <div class="admin-header-title">
+          <span class="admin-badge-icon">🔐</span>
+          <div>
+            <h2 id="adminModalTitle">Yönetici Paneli &amp; Supabase Kelime Havuzu</h2>
+            <p id="adminConnectionBadge" class="admin-conn-status">☁️ Bağlantı kontrol ediliyor...</p>
+          </div>
+        </div>
+        <button type="button" id="btnCloseAdminModal" class="btn-close-modal" aria-label="Kapat">✕</button>
+      </div>
+
+      <div class="admin-modal-body">
+        <!-- YÖNETİCİ GİRİŞ EKRANI (Supabase Auth - Oturum Açılmamışsa) -->
+        <div id="adminAuthSection" class="admin-auth-section">
+          <h3>👤 Yönetici Girişi (Supabase Auth)</h3>
+          <p class="admin-sub-desc">Supabase Authentication üzerindeki yönetici e-posta ve şifrenizle giriş yaparak tabloya yeni kelime veya cümle ekleyebilirsiniz.</p>
+          <form id="adminLoginForm" class="admin-login-form">
+            <div class="admin-field">
+              <label for="adminEmailInput">E-posta Adresi:</label>
+              <input type="email" id="adminEmailInput" class="candy-text-input" placeholder="ornek@eposta.com" required />
+            </div>
+            <div class="admin-field">
+              <label for="adminPasswordInput">Şifre:</label>
+              <input type="password" id="adminPasswordInput" class="candy-text-input" placeholder="••••••••" required />
+            </div>
+            <div class="admin-login-actions">
+              <button type="submit" id="btnAdminLoginSubmit" class="btn-admin-primary">🔑 Giriş Yap</button>
+              <span id="adminAuthError" class="admin-error-msg"></span>
+            </div>
+          </form>
+        </div>
+
+        <!-- 3. YÖNETİCİ KELİME EKLEME & TABLO YÖNETİMİ (Oturum Açılmışsa) -->
+        <div id="adminDashboardSection" class="admin-dashboard-section hidden">
+          <div class="admin-session-bar">
+            <div>
+              <span class="session-dot"></span>
+              <span>Aktif Yönetici: <strong id="adminUserEmailDisplay">-</strong></span>
+            </div>
+            <button type="button" id="btnAdminLogout" class="btn-text-action danger">🚪 Çıkış Yap</button>
+          </div>
+
+          <!-- Yeni Kelime / Cümle Ekleme Formu -->
+          <div class="admin-add-card">
+            <h3>➕ Supabase Tablosuna Yeni Kelime / Cümle Ekle</h3>
+            <div class="admin-form-grid">
+              <div class="admin-field">
+                <label for="adminGroupSelect">1. Sınıf Harf Grubu:</label>
+                <select id="adminGroupSelect" class="candy-select">
+                  <option value="grup_1_anetil">1. Grup (A - N - E - T - İ - L)</option>
+                  <option value="grup_2_okurim">2. Grup (O - K - U - R - I - M)</option>
+                  <option value="grup_3_usoydz">3. Grup (Ü - S - Ö - Y - D - Z)</option>
+                  <option value="grup_4_cbgcs">4. Grup (Ç - B - G - C - Ş)</option>
+                  <option value="grup_5_phvgfj">5. Grup (P - H - V - Ğ - F - J)</option>
+                </select>
+              </div>
+
+              <div class="admin-field">
+                <label for="adminTypeSelect">İçerik Türü:</label>
+                <select id="adminTypeSelect" class="candy-select">
+                  <option value="auto">✨ Otomatik Algıla (Tek kelime / Cümle)</option>
+                  <option value="word">🔤 Kelime</option>
+                  <option value="sentence">📖 Cümle</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="admin-field">
+              <label for="adminContentTextarea">Eklenecek Kelime veya Cümleler (Alt alta birden fazla yazabilirsiniz):</label>
+              <textarea
+                id="adminContentTextarea"
+                class="candy-textarea"
+                rows="3"
+                placeholder="Örn:&#10;lale&#10;atlet&#10;Ela lale al."
+              ></textarea>
+              <div id="adminLetterCheckHint" class="letter-check-hint hidden"></div>
+            </div>
+
+            <div class="admin-submit-row">
+              <button type="button" id="btnAdminInsertWords" class="btn-add-word">
+                ☁️ Supabase Tablosuna Kaydet
+              </button>
+              <button type="button" id="btnAdminSeedDefaults" class="btn-mini-pill btn-mini-accent" title="Mevcut 5 harf grubundaki tüm başlangıç kelimelerini Supabase tablosuna yükler">
+                📥 Başlangıç Havuzunu Tabloya Yükle (Seed)
+              </button>
+              <span id="adminInsertStatus" class="admin-feedback-msg"></span>
+            </div>
+          </div>
+
+          <!-- Supabase Tablosundaki Mevcut Kayıtlar -->
+          <div class="admin-records-card">
+            <div class="records-header-row">
+              <h4>📋 Supabase <code>dikte_havuzu</code> Tablosundaki Kayıtlar (<span id="adminTotalRecordsCount">0</span>)</h4>
+              <button type="button" id="btnAdminRefreshRecords" class="btn-mini-pill">🔄 Yenile</button>
+            </div>
+            <div id="adminRecordsList" class="admin-records-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase JS SDK (v2) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="words.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

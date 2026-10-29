@@ -1,0 +1,2563 @@
+/* ==========================================================================
+   NEŞELİ DİKTE YARIŞI - 1. Sınıf Çocuk Dostu Oyun Arayüzü (Mobil & PC Uyumlu)
+   ========================================================================== */
+
+:root {
+  /* Sıcak Hikaye Kitabı Arka Plan ve Yüzey Renkleri */
+  --bg-cream: #FFFDF5;
+  --bg-warm-tint: #FEF9E7;
+  --surface-white: #FFFFFF;
+  --surface-soft: #F8FAFC;
+
+  /* Metin Renkleri */
+  --text-dark: #1E293B;
+  --text-body: #334155;
+  --text-muted: #64748B;
+
+  /* 1. Oyuncu (Berk) - Gökyüzü Mavisi Teması */
+  --p1-light: #E0F2FE;
+  --p1-border: #7DD3FC;
+  --p1-main: #0EA5E9;
+  --p1-dark: #0369A1;
+  --p1-shadow: #0284C7;
+
+  /* 2. Oyuncu (Said) - Mercan Turuncu Teması */
+  --p2-light: #FFEDD5;
+  --p2-border: #FDBA74;
+  --p2-main: #F97316;
+  --p2-dark: #C2410C;
+  --p2-shadow: #EA580C;
+
+  /* Yıldız, Başarı ve Aksiyon Renkleri */
+  --star-gold: #FACC15;
+  --star-amber: #F59E0B;
+  --star-shadow: #D97706;
+  --green-main: #22C55E;
+  --green-dark: #15803D;
+  --purple-main: #8B5CF6;
+  --purple-dark: #6D28D9;
+
+  /* Font Aileleri (Tam Türkçe latin-ext destekli yuvarlak hatlı fontlar) */
+  --font-display: 'Baloo 2', 'Nunito', system-ui, -apple-system, sans-serif;
+  --font-body: 'Nunito', system-ui, -apple-system, sans-serif;
+
+  /* Köşe Yuvarlaklıkları */
+  --radius-xl: 28px;
+  --radius-lg: 22px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+  --radius-pill: 999px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  min-height: 100%;
+  background-color: var(--bg-cream);
+  background-image:
+    radial-gradient(circle at 12% 18%, rgba(56, 189, 248, 0.12) 0%, transparent 28%),
+    radial-gradient(circle at 88% 15%, rgba(250, 204, 21, 0.16) 0%, transparent 28%),
+    radial-gradient(circle at 85% 82%, rgba(251, 146, 60, 0.12) 0%, transparent 30%),
+    radial-gradient(circle at 15% 85%, rgba(34, 197, 94, 0.10) 0%, transparent 26%);
+  color: var(--text-dark);
+  font-family: var(--font-body);
+  line-height: 1.45;
+  overflow-x: hidden;
+}
+
+/* Arka Plan Yüzen Bulutlar ve Yıldızlar */
+.bg-decorations {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.bg-cloud, .bg-star {
+  position: absolute;
+  user-select: none;
+  opacity: 0.35;
+}
+
+.cloud-1 { top: 6%; left: 4%; font-size: 3rem; animation: floatSlow 14s ease-in-out infinite; }
+.cloud-2 { top: 12%; right: 6%; font-size: 2.6rem; animation: floatSlow 18s ease-in-out infinite reverse; }
+.cloud-3 { bottom: 8%; left: 8%; font-size: 2.4rem; animation: floatSlow 16s ease-in-out infinite 2s; }
+.star-1 { top: 24%; left: 2%; font-size: 1.6rem; animation: twinkle 4s ease-in-out infinite; }
+.star-2 { top: 32%; right: 3%; font-size: 1.8rem; animation: twinkle 5s ease-in-out infinite 1s; }
+.star-3 { bottom: 18%; right: 5%; font-size: 1.7rem; animation: twinkle 4.5s ease-in-out infinite 0.5s; }
+.star-4 { bottom: 28%; left: 3%; font-size: 1.6rem; animation: twinkle 6s ease-in-out infinite 1.5s; }
+
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0px) translateX(0px); }
+  50% { transform: translateY(-10px) translateX(10px); }
+}
+
+@keyframes twinkle {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.28; }
+  50% { transform: scale(1.2) rotate(12deg); opacity: 0.55; }
+}
+
+/* Efekt Katmanı (Konfeti ve Uçan Yıldızlar) */
+.fx-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+/* Yardımcı Sınıflar */
+.hidden {
+  display: none !important;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+/* ==========================================================================
+   ÜST BAR (HEADER)
+   ========================================================================== */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  background: rgba(255, 253, 245, 0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 3px dashed rgba(245, 158, 11, 0.25);
+}
+
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.mascot-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: #FFFBEB;
+  box-shadow: 0 4px 0 #F59E0B;
+  border: 2px solid #F59E0B;
+  transition: transform 0.2s ease;
+}
+
+.brand-group:hover .mascot-badge {
+  transform: rotate(-6deg) scale(1.06);
+}
+
+.brand-text h1 {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #0F172A;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.brand-subtitle {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #D97706;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.voice-pill-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: #FEF3C7;
+  border: 2px solid #FCD34D;
+  border-radius: var(--radius-pill);
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: #92400E;
+}
+
+.btn-header-action {
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  border: 2px solid #CBD5E1;
+  background: #FFFFFF;
+  color: var(--text-dark);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #CBD5E1;
+  transition: all 0.15s ease;
+}
+
+.btn-header-action:hover {
+  background: #F1F5F9;
+  transform: translateY(-1px);
+}
+
+.btn-header-action:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #CBD5E1;
+}
+
+/* ==========================================================================
+   ANA KONTEYNER VE EKRAN GEÇİŞLERİ
+   ========================================================================== */
+.app-main {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 16px 20px 36px;
+}
+
+.screen {
+  display: none;
+  animation: popInScreen 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.screen.active {
+  display: block;
+}
+
+@keyframes popInScreen {
+  from { opacity: 0; transform: translateY(10px) scale(0.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ==========================================================================
+   EKRAN 1: KURULUM VE KELİME HAVUZU
+   ========================================================================== */
+.welcome-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: linear-gradient(135deg, #FEF3C7 0%, #E0F2FE 100%);
+  border: 3px solid #FCD34D;
+  border-radius: var(--radius-lg);
+  padding: 16px 22px;
+  margin-bottom: 20px;
+  box-shadow: 0 6px 0 rgba(245, 158, 11, 0.2);
+}
+
+.welcome-banner-icon {
+  font-size: 2.3rem;
+  flex-shrink: 0;
+}
+
+.welcome-banner-content h2 {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: #1E293B;
+  margin-bottom: 3px;
+}
+
+.welcome-banner-content p {
+  font-size: 0.95rem;
+  color: #334155;
+  font-weight: 700;
+}
+
+/* 2 Sütunlu Kurulum Grid */
+.setup-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 22px;
+  align-items: start;
+  width: 100%;
+  max-width: 100%;
+}
+
+.setup-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.card {
+  background: var(--surface-white);
+  border-radius: var(--radius-xl);
+  padding: 22px;
+  border: 3px solid #E2E8F0;
+  box-shadow: 0 8px 0 #E2E8F0, 0 12px 24px rgba(15, 23, 42, 0.05);
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.card-players {
+  border-color: #BAE6FD;
+  box-shadow: 0 8px 0 #BAE6FD;
+}
+
+.card-voice {
+  border-color: #DDD6FE;
+  box-shadow: 0 8px 0 #DDD6FE;
+}
+
+.card-pool {
+  border-color: #FDE68A;
+  box-shadow: 0 8px 0 #FDE68A;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  font-size: 1.55rem;
+  background: #FFFBEB;
+  border: 2px solid #FDE68A;
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+
+.card-header h3 {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  color: var(--text-dark);
+}
+
+.card-header p {
+  font-size: 0.86rem;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+/* Oyuncu Kurulum Kutuları */
+.players-setup-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+}
+
+.player-setup-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 12px;
+  border-radius: var(--radius-lg);
+  border: 3px solid transparent;
+  text-align: center;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.player-1-theme {
+  background: var(--p1-light);
+  border-color: var(--p1-border);
+}
+
+.player-2-theme {
+  background: var(--p2-light);
+  border-color: var(--p2-border);
+}
+
+.player-badge-tag {
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  margin-bottom: 10px;
+}
+
+.player-1-theme .player-badge-tag {
+  background: #BAE6FD;
+  color: #0369A1;
+}
+
+.player-2-theme .player-badge-tag {
+  background: #FED7AA;
+  color: #C2410C;
+}
+
+.avatar-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.avatar-preview {
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.3rem;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.08);
+  border: 2px solid rgba(0, 0, 0, 0.08);
+  user-select: none;
+}
+
+.avatar-cycle-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid rgba(15, 23, 42, 0.15);
+  background: #FFFFFF;
+  font-size: 0.8rem;
+  font-weight: 900;
+  cursor: pointer;
+  color: var(--text-dark);
+  box-shadow: 0 2px 0 rgba(0,0,0,0.1);
+  transition: transform 0.12s ease;
+}
+
+.avatar-cycle-btn:hover {
+  transform: scale(1.1);
+}
+
+.avatar-cycle-btn:active {
+  transform: scale(0.95);
+}
+
+.player-name-input {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 2.5px solid rgba(15, 23, 42, 0.18);
+  background: #FFFFFF;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text-dark);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.player-1-theme .player-name-input:focus {
+  border-color: var(--p1-main);
+  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.2);
+}
+
+.player-2-theme .player-name-input:focus {
+  border-color: var(--p2-main);
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.2);
+}
+
+.vs-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--star-gold);
+  border: 3px solid var(--star-amber);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #78350F;
+  box-shadow: 0 4px 0 var(--star-amber);
+}
+
+/* Ses Seçim Kartları (Kadın / Erkek Sesi) */
+.voice-gender-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.voice-gender-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 12px;
+  border-radius: var(--radius-lg);
+  border: 3px solid #E2E8F0;
+  background: #F8FAFC;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.16s ease;
+  box-shadow: 0 5px 0 #E2E8F0;
+}
+
+.voice-gender-card:hover {
+  transform: translateY(-2px);
+  border-color: #C4B5FD;
+}
+
+.voice-gender-card.selected {
+  background: #F5F3FF;
+  border-color: var(--purple-main);
+  box-shadow: 0 5px 0 #7C3AED;
+}
+
+.voice-avatar {
+  font-size: 2.2rem;
+  margin-bottom: 4px;
+}
+
+.voice-title {
+  font-family: var(--font-display);
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.voice-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin: 4px 0 8px;
+}
+
+.voice-check {
+  font-size: 0.76rem;
+  font-weight: 900;
+  padding: 3px 12px;
+  border-radius: var(--radius-pill);
+  background: #E2E8F0;
+  color: #475569;
+}
+
+.voice-gender-card.selected .voice-check {
+  background: var(--purple-main);
+  color: #FFFFFF;
+}
+
+.voice-controls-row {
+  margin-bottom: 14px;
+}
+
+.btn-test-voice {
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: var(--radius-md);
+  border: 2.5px solid #C4B5FD;
+  background: #EDE9FE;
+  color: #5B21B6;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.96rem;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #C4B5FD;
+  transition: all 0.15s ease;
+}
+
+.btn-test-voice:hover {
+  background: #DDD6FE;
+}
+
+.btn-test-voice:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #C4B5FD;
+}
+
+.dictation-tuning-box {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+  width: 100%;
+}
+
+.tuning-item {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.tuning-item label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--text-body);
+  margin-bottom: 5px;
+}
+
+.candy-select {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: 9px 10px;
+  border-radius: var(--radius-sm);
+  border: 2px solid #CBD5E1;
+  background: #FFFFFF;
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 0.86rem;
+  color: var(--text-dark);
+  outline: none;
+  cursor: pointer;
+}
+
+.candy-select:focus {
+  border-color: var(--purple-main);
+}
+
+.dictation-options-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 2px dashed #E2E8F0;
+}
+
+.candy-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-body);
+  cursor: pointer;
+  user-select: none;
+}
+
+.candy-checkbox-label input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--purple-main);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.candy-checkbox-label em {
+  color: var(--text-muted);
+  font-style: normal;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   SAĞ SÜTUN: KELİME EKLEME & 1. SINIF HAVUZU
+   ========================================================================== */
+.section-sub-label {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.96rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 8px;
+}
+
+.custom-add-box {
+  background: #FFFBEB;
+  border: 2.5px solid #FDE68A;
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+.custom-input-row {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+
+.candy-text-input {
+  flex: 1;
+  min-width: 0;
+  max-width: 100%;
+  padding: 11px 14px;
+  border-radius: var(--radius-sm);
+  border: 2.5px solid #CBD5E1;
+  background: #FFFFFF;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  outline: none;
+}
+
+.candy-text-input:focus {
+  border-color: var(--star-amber);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+}
+
+.btn-add-word {
+  padding: 11px 18px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--green-main);
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--green-dark);
+  white-space: nowrap;
+  transition: transform 0.12s ease;
+}
+
+.btn-add-word:hover {
+  background: #16A34A;
+}
+
+.btn-add-word:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--green-dark);
+}
+
+.input-hint {
+  display: block;
+  font-size: 0.78rem;
+  color: #92400E;
+  font-weight: 700;
+  margin-top: 6px;
+}
+
+/* Havuz Seçici */
+.pool-browser-box {
+  margin-bottom: 16px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.pool-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.pool-header-row .section-sub-label {
+  margin-bottom: 0;
+}
+
+.pool-quick-btns {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.btn-mini-pill {
+  padding: 5px 11px;
+  border-radius: var(--radius-pill);
+  border: 2px solid #CBD5E1;
+  background: #F8FAFC;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--text-body);
+  cursor: pointer;
+  transition: all 0.14s ease;
+}
+
+.btn-mini-pill:hover {
+  background: #E2E8F0;
+}
+
+.btn-mini-accent {
+  background: #FEF3C7;
+  border-color: #FCD34D;
+  color: #92400E;
+}
+
+.btn-mini-accent:hover {
+  background: #FDE68A;
+}
+
+.category-tabs {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.category-tab-btn {
+  padding: 7px 13px;
+  border-radius: var(--radius-pill);
+  border: 2px solid #E2E8F0;
+  background: #F8FAFC;
+  font-family: var(--font-display);
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-body);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.category-tab-btn:hover {
+  border-color: #94A3B8;
+}
+
+.category-tab-btn.active {
+  background: var(--text-dark);
+  border-color: var(--text-dark);
+  color: #FFFFFF;
+}
+
+/* Harf Grubu Bilgi ve Filtre Çubuğu */
+.group-info-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #FEF9E7;
+  border: 2px solid #FDE68A;
+  border-radius: var(--radius-md);
+  margin-bottom: 10px;
+}
+
+.group-letters-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.group-letters-caption {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #92400E;
+  margin-right: 4px;
+}
+
+.letter-tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: #FFFFFF;
+  border: 2px solid #F59E0B;
+  box-shadow: 0 2px 0 #F59E0B;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.group-type-filter {
+  display: inline-flex;
+  background: #FFFFFF;
+  border: 2px solid #E2E8F0;
+  border-radius: var(--radius-pill);
+  padding: 2px;
+  gap: 2px;
+}
+
+.type-filter-btn {
+  border: none;
+  background: transparent;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.14s ease;
+}
+
+.type-filter-btn.active {
+  background: var(--purple-main);
+  color: #FFFFFF;
+}
+
+.pool-chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  max-height: 165px;
+  overflow-y: auto;
+  padding: 12px;
+  background: #F8FAFC;
+  border: 2px solid #E2E8F0;
+  border-radius: var(--radius-md);
+}
+
+.pool-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border-radius: var(--radius-pill);
+  border: 2px solid #CBD5E1;
+  background: #FFFFFF;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  cursor: pointer;
+  user-select: none;
+  box-shadow: 0 2px 0 #CBD5E1;
+  transition: all 0.12s ease;
+}
+
+.pool-chip:hover {
+  transform: translateY(-1px);
+  border-color: #38BDF8;
+}
+
+.pool-chip.in-queue {
+  background: #DCFCE7;
+  border-color: #22C55E;
+  color: #14532D;
+  box-shadow: 0 2px 0 #22C55E;
+}
+
+/* Seçilen Sıra Listesi */
+.selected-queue-box {
+  background: #F8FAFC;
+  border: 2px solid #E2E8F0;
+  border-radius: var(--radius-md);
+  padding: 12px;
+}
+
+.queue-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.queue-header-row .section-sub-label {
+  margin-bottom: 0;
+}
+
+.queue-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-text-action {
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #0284C7;
+  cursor: pointer;
+  padding: 3px 6px;
+  border-radius: 6px;
+}
+
+.btn-text-action:hover {
+  background: #E0F2FE;
+}
+
+.btn-text-action.danger {
+  color: #DC2626;
+}
+
+.btn-text-action.danger:hover {
+  background: #FEE2E2;
+}
+
+.selected-queue-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  max-height: 155px;
+  overflow-y: auto;
+}
+
+.queue-item-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 11px;
+  border-radius: var(--radius-sm);
+  background: #FFFFFF;
+  border: 2px solid #BAE6FD;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  box-shadow: 0 2px 0 #BAE6FD;
+}
+
+.queue-item-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: var(--radius-pill);
+  background: #0EA5E9;
+  color: #FFFFFF;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.queue-item-remove {
+  background: none;
+  border: none;
+  color: #94A3B8;
+  font-size: 0.95rem;
+  font-weight: 900;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 2px;
+}
+
+.queue-item-remove:hover {
+  color: #EF4444;
+}
+
+.empty-queue-notice {
+  width: 100%;
+  text-align: center;
+  padding: 18px 10px;
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+/* DEV BAŞLAT BUTONU */
+.start-game-bar {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-giant-start {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 620px;
+  padding: 18px 28px;
+  border-radius: var(--radius-xl);
+  border: 3px solid #15803D;
+  background: linear-gradient(180deg, #4ADE80 0%, #22C55E 100%);
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 0 #15803D, 0 14px 28px rgba(34, 197, 94, 0.35);
+  transition: all 0.15s ease;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.18);
+}
+
+.btn-giant-start:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 0 #15803D, 0 18px 32px rgba(34, 197, 94, 0.4);
+}
+
+.btn-giant-start:active {
+  transform: translateY(5px);
+  box-shadow: 0 3px 0 #15803D;
+}
+
+.start-btn-icon {
+  font-size: 1.8rem;
+}
+
+.start-btn-sub {
+  font-size: 0.88rem;
+  background: rgba(0, 0, 0, 0.18);
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   EKRAN 2: CANLI DİKTE DÜELLOSU EKRANI
+   ========================================================================== */
+.dictation-stage-bar {
+  background: var(--surface-white);
+  border: 3px solid #FDE68A;
+  border-radius: var(--radius-xl);
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  box-shadow: 0 6px 0 #FDE68A;
+}
+
+.stage-progress-pill {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.stage-step-badge {
+  background: var(--star-amber);
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.stage-progress-track {
+  flex: 1;
+  height: 12px;
+  background: #FEF3C7;
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  border: 2px solid #FDE68A;
+}
+
+.stage-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #FBBF24, #22C55E);
+  border-radius: var(--radius-pill);
+  transition: width 0.35s ease;
+}
+
+.speaker-center-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* Konuşan Hoparlör Küresi */
+.speaker-wave-wrapper {
+  position: relative;
+  width: 68px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.wave-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid #38BDF8;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.speaker-wave-wrapper.speaking .ring-1 {
+  animation: soundPulse 1.3s ease-out infinite;
+}
+
+.speaker-wave-wrapper.speaking .ring-2 {
+  animation: soundPulse 1.3s ease-out infinite 0.4s;
+}
+
+@keyframes soundPulse {
+  0% { transform: scale(0.95); opacity: 0.85; }
+  100% { transform: scale(1.55); opacity: 0; }
+}
+
+.speaker-orb-btn {
+  position: relative;
+  z-index: 2;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  border: 3px solid #0284C7;
+  background: linear-gradient(180deg, #38BDF8, #0284C7);
+  color: #FFFFFF;
+  font-size: 1.75rem;
+  cursor: pointer;
+  box-shadow: 0 5px 0 #0369A1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.12s ease;
+}
+
+.speaker-orb-btn:hover {
+  transform: scale(1.06);
+}
+
+.speaker-orb-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 #0369A1;
+}
+
+.dictation-live-info {
+  flex: 1;
+  min-width: 220px;
+}
+
+.dictation-status-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.86rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.live-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #22C55E;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.25);
+  animation: blinkDot 1.2s ease-in-out infinite;
+}
+
+.live-dot.paused {
+  background: #F59E0B;
+  animation: none;
+}
+
+@keyframes blinkDot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.dictation-word-box {
+  background: #FFFBEB;
+  border: 2.5px dashed #F59E0B;
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+}
+
+.word-hidden-mask {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #B45309;
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+.ear-icon {
+  font-size: 1.35rem;
+}
+
+.word-visible-text {
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #0F172A;
+  letter-spacing: 0.02em;
+}
+
+.stage-utility-btns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-stage-tool {
+  padding: 9px 14px;
+  border-radius: var(--radius-md);
+  border: 2px solid #CBD5E1;
+  background: #F8FAFC;
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  cursor: pointer;
+  box-shadow: 0 3px 0 #CBD5E1;
+  transition: all 0.12s ease;
+}
+
+.btn-stage-tool:hover {
+  background: #E2E8F0;
+}
+
+.btn-stage-tool:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #CBD5E1;
+}
+
+/* ==========================================================================
+   İKİ OYUNCULU BÖLÜNMÜŞ DÜELLO ARENASI (BERK vs SAİD)
+   ========================================================================== */
+.duel-arena {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  min-height: 430px;
+}
+
+.player-zone {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: var(--radius-xl);
+  padding: 20px;
+  border: 4px solid transparent;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.player-1-zone {
+  background: linear-gradient(180deg, #E0F2FE 0%, #BAE6FD 100%);
+  border-color: #38BDF8;
+  box-shadow: 0 10px 0 #0284C7, 0 16px 30px rgba(2, 132, 199, 0.15);
+}
+
+.player-2-zone {
+  background: linear-gradient(180deg, #FFEDD5 0%, #FED7AA 100%);
+  border-color: #FB923C;
+  box-shadow: 0 10px 0 #EA580C, 0 16px 30px rgba(234, 88, 12, 0.15);
+}
+
+.zone-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.zone-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.zone-avatar {
+  width: 58px;
+  height: 58px;
+  border-radius: 18px;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1);
+}
+
+.zone-player-name {
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: #0F172A;
+  line-height: 1.1;
+}
+
+.zone-key-hint {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #475569;
+}
+
+.zone-score-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #FFFFFF;
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  border: 3px solid var(--star-amber);
+  box-shadow: 0 4px 0 var(--star-amber);
+}
+
+.score-star-icon {
+  font-size: 1.45rem;
+}
+
+.score-number {
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: #B45309;
+}
+
+/* Yıldız Tepsisi */
+.stars-tray {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-height: 54px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.72);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  margin-bottom: 16px;
+}
+
+.empty-tray-hint {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #64748B;
+}
+
+.earned-star-badge {
+  font-size: 1.55rem;
+  animation: starBounceIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  filter: drop-shadow(0 2px 2px rgba(217, 119, 6, 0.35));
+}
+
+@keyframes starBounceIn {
+  0% { transform: scale(0) rotate(-45deg); }
+  70% { transform: scale(1.3) rotate(12deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* DEV OYUNCU DOKUNMA / TIKLAMA BUTONU */
+.player-tap-button {
+  flex: 1;
+  min-height: 210px;
+  width: 100%;
+  border-radius: var(--radius-xl);
+  border: 4px solid rgba(255, 255, 255, 0.65);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.15s ease;
+}
+
+.p1-tap-btn {
+  background: linear-gradient(180deg, #38BDF8 0%, #0284C7 100%);
+  color: #FFFFFF;
+  box-shadow: 0 10px 0 #075985, inset 0 3px 0 rgba(255, 255, 255, 0.45);
+}
+
+.p2-tap-btn {
+  background: linear-gradient(180deg, #FB923C 0%, #EA580C 100%);
+  color: #FFFFFF;
+  box-shadow: 0 10px 0 #9A3412, inset 0 3px 0 rgba(255, 255, 255, 0.45);
+}
+
+.player-tap-button:hover {
+  filter: brightness(1.05);
+  transform: translateY(-2px);
+}
+
+.player-tap-button:active {
+  transform: translateY(7px);
+}
+
+.p1-tap-btn:active {
+  box-shadow: 0 3px 0 #075985;
+}
+
+.p2-tap-btn:active {
+  box-shadow: 0 3px 0 #9A3412;
+}
+
+.tap-star-burst {
+  font-size: 3.3rem;
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.2));
+  transition: transform 0.2s ease;
+}
+
+.player-tap-button:hover .tap-star-burst {
+  transform: scale(1.18) rotate(10deg);
+}
+
+.tap-main-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+}
+
+.tap-sub-title {
+  font-size: 1rem;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.18);
+  padding: 5px 16px;
+  border-radius: var(--radius-pill);
+}
+
+/* Tur Sonu Yıldız Kazanıldı Kutlama Katmanı */
+.round-winner-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.round-winner-card {
+  background: #FFFFFF;
+  border: 4px solid var(--star-amber);
+  border-radius: var(--radius-xl);
+  padding: 28px 32px;
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 12px 0 var(--star-amber), 0 24px 48px rgba(0, 0, 0, 0.3);
+  animation: popWinnerCard 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes popWinnerCard {
+  from { transform: scale(0.75); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.round-star-anim {
+  font-size: 4.2rem;
+  margin-bottom: 6px;
+  animation: spinStar 0.7s ease-out;
+}
+
+@keyframes spinStar {
+  0% { transform: scale(0.2) rotate(-180deg); }
+  80% { transform: scale(1.2) rotate(15deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.round-winner-card h3 {
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  color: var(--text-dark);
+  margin-bottom: 14px;
+}
+
+.round-revealed-word-box {
+  background: #FEF3C7;
+  border: 3px dashed #F59E0B;
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  margin-bottom: 14px;
+}
+
+.revealed-caption {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #92400E;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.revealed-word-text {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #0F172A;
+}
+
+.round-next-hint {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.btn-Quick-Next {
+  padding: 10px 22px;
+  border-radius: var(--radius-pill);
+  border: none;
+  background: var(--green-main);
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--green-dark);
+}
+
+/* ==========================================================================
+   EKRAN 3: OYUN SONU ŞAMPİYONLUK EKRANI
+   ========================================================================== */
+.results-card {
+  background: #FFFFFF;
+  border: 4px solid #FDE68A;
+  border-radius: var(--radius-xl);
+  padding: 30px 24px;
+  text-align: center;
+  box-shadow: 0 10px 0 #FDE68A;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.trophy-illustration {
+  font-size: 4.2rem;
+  margin-bottom: 6px;
+}
+
+.winner-headline {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--text-dark);
+  margin-bottom: 6px;
+}
+
+.winner-subtext {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+}
+
+.final-scoreboard {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 26px;
+}
+
+.final-player-card {
+  position: relative;
+  padding: 22px 16px;
+  border-radius: var(--radius-xl);
+  border: 3px solid transparent;
+}
+
+.p1-final {
+  background: var(--p1-light);
+  border-color: var(--p1-border);
+}
+
+.p2-final {
+  background: var(--p2-light);
+  border-color: var(--p2-border);
+}
+
+.final-player-card.winner-glow {
+  border-color: var(--star-amber);
+  box-shadow: 0 8px 0 var(--star-amber), 0 0 28px rgba(250, 204, 21, 0.45);
+}
+
+.final-crown {
+  font-size: 2.3rem;
+  margin-bottom: 4px;
+  animation: floatSlow 2.5s ease-in-out infinite;
+}
+
+.final-avatar {
+  font-size: 3rem;
+  margin-bottom: 6px;
+}
+
+.final-player-card h3 {
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  margin-bottom: 8px;
+}
+
+.final-star-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #FFFFFF;
+  padding: 6px 18px;
+  border-radius: var(--radius-pill);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #B45309;
+  border: 2px solid var(--star-amber);
+  margin-bottom: 10px;
+}
+
+.final-stars-visual {
+  font-size: 1.35rem;
+  min-height: 28px;
+  word-spacing: 3px;
+}
+
+.paper-check-section {
+  background: #FFFBEB;
+  border: 2.5px solid #FDE68A;
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.paper-check-section h4 {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  margin-bottom: 4px;
+}
+
+.paper-check-sub {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.completed-words-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.completed-word-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: #FFFFFF;
+  border: 2px solid #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  font-weight: 800;
+}
+
+.completed-word-winner {
+  font-size: 0.78rem;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  background: #FEF3C7;
+  color: #92400E;
+  white-space: nowrap;
+}
+
+.results-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-large-secondary {
+  padding: 13px 26px;
+  border-radius: var(--radius-lg);
+  border: 3px solid #CBD5E1;
+  background: #F8FAFC;
+  font-family: var(--font-display);
+  font-size: 1.08rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  cursor: pointer;
+  box-shadow: 0 5px 0 #CBD5E1;
+}
+
+/* Konfeti Parçacığı */
+.confetti-piece {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  pointer-events: none;
+  animation: confettiFall 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes confettiFall {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(0.6);
+    opacity: 0;
+  }
+}
+
+/* ==========================================================================
+   MOBİL VE TABLET UYUMLULUK (RESPONSIVE TASARIM)
+   ========================================================================== */
+@media (max-width: 960px) {
+  .setup-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .app-header {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .mascot-badge {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+  }
+
+  .mascot-badge svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .brand-text h1 {
+    font-size: 1.05rem;
+  }
+
+  .brand-subtitle {
+    font-size: 0.7rem;
+  }
+
+  .btn-header-action {
+    padding: 6px 11px;
+    font-size: 0.8rem;
+  }
+
+  .app-main {
+    padding: 10px 10px 24px;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  /* Ana Sayfa (Kurulum) Mobil Düzeni */
+  .welcome-banner {
+    padding: 10px 12px;
+    gap: 10px;
+    margin-bottom: 12px;
+    border-radius: var(--radius-md);
+  }
+
+  .welcome-banner-icon {
+    font-size: 1.65rem;
+  }
+
+  .welcome-banner-content h2 {
+    font-size: 0.98rem;
+  }
+
+  .welcome-banner-content p {
+    font-size: 0.8rem;
+    line-height: 1.35;
+  }
+
+  .setup-grid,
+  .setup-column {
+    gap: 12px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .card {
+    padding: 14px 12px;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 5px 0 #E2E8F0;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .card-header {
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .card-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 1.25rem;
+    border-radius: 11px;
+  }
+
+  .card-header h3 {
+    font-size: 1.02rem;
+  }
+
+  .card-header p {
+    font-size: 0.76rem;
+  }
+
+  /* Mobilde de 2 Oyuncu Kurulum Kartı Yan Yana */
+  .players-setup-row {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 6px;
+    width: 100%;
+  }
+
+  .player-setup-box {
+    padding: 10px 6px;
+    border-radius: var(--radius-md);
+    min-width: 0;
+  }
+
+  .player-badge-tag {
+    font-size: 0.65rem;
+    padding: 2px 7px;
+    margin-bottom: 6px;
+    white-space: nowrap;
+  }
+
+  .avatar-picker-row {
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
+  .avatar-preview {
+    width: 44px;
+    height: 44px;
+    font-size: 1.65rem;
+    border-radius: 13px;
+  }
+
+  .avatar-cycle-btn {
+    width: 26px;
+    height: 26px;
+    font-size: 0.7rem;
+  }
+
+  .player-name-input {
+    padding: 7px 6px;
+    font-size: 0.95rem;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .vs-divider {
+    width: 28px;
+    height: 28px;
+    font-size: 0.72rem;
+    border-width: 2px;
+    flex-shrink: 0;
+  }
+
+  /* Mobilde Tekrar Aralığı ve Hız Yan Yana */
+  .dictation-tuning-box {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px;
+    width: 100%;
+  }
+
+  .tuning-item label {
+    font-size: 0.76rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .candy-select {
+    padding: 7px 6px;
+    font-size: 0.78rem;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .candy-checkbox-label {
+    font-size: 0.8rem;
+    gap: 8px;
+  }
+
+  .custom-add-box {
+    padding: 10px;
+    margin-bottom: 12px;
+  }
+
+  .candy-text-input {
+    padding: 9px 10px;
+    font-size: 0.9rem;
+    min-width: 0;
+  }
+
+  .btn-add-word {
+    padding: 9px 14px;
+    font-size: 0.9rem;
+  }
+
+  .pool-quick-btns {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 5px;
+    width: 100%;
+  }
+
+  .btn-mini-pill {
+    text-align: center;
+    padding: 6px 4px;
+    font-size: 0.71rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .group-info-banner {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .letter-tile {
+    width: 26px;
+    height: 26px;
+    font-size: 0.85rem;
+  }
+
+  .pool-chips-container {
+    max-height: 140px;
+    padding: 8px;
+    gap: 5px;
+  }
+
+  .pool-chip {
+    padding: 5px 10px;
+    font-size: 0.82rem;
+  }
+
+  .btn-giant-start {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 14px 16px;
+    font-size: 1.15rem;
+    border-radius: var(--radius-lg);
+  }
+
+  .start-btn-icon {
+    font-size: 1.35rem;
+  }
+
+  .start-btn-sub {
+    font-size: 0.76rem;
+    padding: 3px 10px;
+  }
+
+  /* ==========================================================================
+     MOBİL YARIŞ EKRANI: Üst Bar Kompakt + "BEN YAZDIM!" Butonları YAN YANA
+     ========================================================================== */
+  .dictation-stage-bar {
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    border-radius: var(--radius-lg);
+  }
+
+  .stage-progress-pill {
+    margin-bottom: 8px;
+    gap: 8px;
+  }
+
+  .stage-step-badge {
+    font-size: 0.78rem;
+    padding: 3px 9px;
+  }
+
+  .speaker-center-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px;
+    align-items: center;
+  }
+
+  .speaker-wave-wrapper {
+    width: 50px;
+    height: 50px;
+  }
+
+  .speaker-orb-btn {
+    width: 46px;
+    height: 46px;
+    font-size: 1.35rem;
+  }
+
+  .dictation-live-info {
+    min-width: 0;
+  }
+
+  .dictation-status-line {
+    font-size: 0.74rem;
+    margin-bottom: 4px;
+  }
+
+  .dictation-word-box {
+    min-height: 42px;
+    padding: 6px 10px;
+  }
+
+  .word-hidden-mask {
+    font-size: 0.82rem;
+    gap: 6px;
+  }
+
+  .ear-icon {
+    font-size: 1.05rem;
+  }
+
+  .word-visible-text {
+    font-size: 1.15rem;
+  }
+
+  .stage-utility-btns {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    width: 100%;
+  }
+
+  .btn-stage-tool {
+    padding: 7px 6px;
+    font-size: 0.78rem;
+    text-align: center;
+  }
+
+  /* İki Oyuncu Bölümü ve "BEN YAZDIM!" Butonları Mobilde de YAN YANA */
+  .duel-arena {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px;
+    min-height: auto;
+    width: 100%;
+  }
+
+  .player-zone {
+    padding: 10px 8px;
+    border-radius: var(--radius-lg);
+    border-width: 3px;
+    box-shadow: 0 6px 0 rgba(0, 0, 0, 0.15);
+    min-width: 0;
+  }
+
+  .zone-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
+  .zone-identity {
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .zone-avatar {
+    width: 34px;
+    height: 34px;
+    font-size: 1.3rem;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+
+  .zone-player-name {
+    font-size: 1.05rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .zone-key-hint {
+    display: none;
+  }
+
+  .zone-score-pill {
+    padding: 4px 8px;
+    gap: 3px;
+    border-width: 2px;
+    flex-shrink: 0;
+  }
+
+  .score-star-icon {
+    font-size: 1rem;
+  }
+
+  .score-number {
+    font-size: 1.1rem;
+  }
+
+  .stars-tray {
+    min-height: 32px;
+    margin-bottom: 8px;
+    padding: 4px 6px;
+    gap: 3px;
+  }
+
+  .empty-tray-hint {
+    font-size: 0.68rem;
+    line-height: 1.2;
+  }
+
+  .earned-star-badge {
+    font-size: 1.1rem;
+  }
+
+  .player-tap-button {
+    min-height: 190px;
+    padding: 14px 6px;
+    border-radius: var(--radius-lg);
+    gap: 6px;
+  }
+
+  .tap-star-burst {
+    font-size: 2.3rem;
+  }
+
+  .tap-main-title {
+    font-size: 1.22rem;
+    line-height: 1.15;
+    text-align: center;
+  }
+
+  .tap-sub-title {
+    font-size: 0.72rem;
+    padding: 4px 8px;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  /* Sonuç Ekranı Mobilde de Yan Yana */
+  .final-scoreboard {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .final-player-card {
+    padding: 14px 10px;
+  }
+
+  .final-avatar {
+    font-size: 2.2rem;
+  }
+
+  .final-player-card h3 {
+    font-size: 1.2rem;
+  }
+
+  .final-star-count {
+    font-size: 0.95rem;
+    padding: 4px 10px;
+  }
+
+  .admin-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ==========================================================================
+   YÖNETİCİ GİRİŞİ VE SUPABASE KELİME YÖNETİM MODALI
+   ========================================================================== */
+.btn-admin-trigger {
+  border-color: #C4B5FD;
+  background: #F5F3FF;
+  color: #5B21B6;
+  box-shadow: 0 3px 0 #C4B5FD;
+}
+
+.btn-admin-trigger.logged-in {
+  border-color: #86EFAC;
+  background: #DCFCE7;
+  color: #166534;
+  box-shadow: 0 3px 0 #86EFAC;
+}
+
+.admin-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.admin-modal-card {
+  width: 100%;
+  max-width: 720px;
+  max-height: 90vh;
+  background: #FFFFFF;
+  border: 4px solid #C4B5FD;
+  border-radius: var(--radius-xl);
+  box-shadow: 0 12px 0 #7C3AED, 0 24px 48px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: popWinnerCard 0.25s ease-out;
+}
+
+.admin-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 22px;
+  background: #F5F3FF;
+  border-bottom: 2px solid #DDD6FE;
+}
+
+.admin-header-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-badge-icon {
+  font-size: 1.9rem;
+}
+
+.admin-header-title h2 {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--text-dark);
+}
+
+.admin-conn-status {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #6D28D9;
+}
+
+.btn-close-modal {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid #CBD5E1;
+  background: #FFFFFF;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--text-dark);
+  cursor: pointer;
+}
+
+.admin-modal-body {
+  padding: 20px 22px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.admin-config-details {
+  background: #F8FAFC;
+  border: 2px solid #E2E8F0;
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+}
+
+.admin-config-details summary {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  color: var(--text-dark);
+}
+
+.config-form-box {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.config-help-text {
+  font-size: 0.83rem;
+  color: var(--text-body);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.config-help-text code {
+  background: #E2E8F0;
+  padding: 2px 6px;
+  border-radius: 5px;
+}
+
+.admin-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.admin-field label {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--text-body);
+}
+
+.config-btn-row,
+.admin-login-actions,
+.admin-submit-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.admin-auth-section,
+.admin-add-card,
+.admin-records-card {
+  background: #FFFDF7;
+  border: 2.5px solid #E2E8F0;
+  border-radius: var(--radius-lg);
+  padding: 16px;
+}
+
+.admin-auth-section h3,
+.admin-add-card h3 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+}
+
+.admin-sub-desc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.admin-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-admin-primary {
+  padding: 11px 22px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--purple-main);
+  color: #FFFFFF;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--purple-dark);
+}
+
+.admin-error-msg {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #DC2626;
+}
+
+.admin-feedback-msg {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #15803D;
+}
+
+.admin-session-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #DCFCE7;
+  border: 2px solid #86EFAC;
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #14532D;
+  margin-bottom: 14px;
+}
+
+.session-dot {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #22C55E;
+  margin-right: 6px;
+}
+
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.candy-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 2.5px solid #CBD5E1;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  resize: vertical;
+  outline: none;
+}
+
+.candy-textarea:focus {
+  border-color: var(--purple-main);
+}
+
+.letter-check-hint {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: #FEF3C7;
+  border: 2px solid #FCD34D;
+  color: #92400E;
+  font-size: 0.82rem;
+  font-weight: 800;
+  margin-top: 4px;
+}
+
+.admin-records-card {
+  margin-top: 14px;
+}
+
+.records-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.admin-records-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.admin-record-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: #FFFFFF;
+  border: 2px solid #E2E8F0;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.record-meta-badge {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: #E0F2FE;
+  color: #0369A1;
+}
